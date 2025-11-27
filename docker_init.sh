@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+ENABLE_SUBSCRIBE=${ENABLE_SUBSCRIBE:-true}
 # 脚本更新日期 2025.11.05
 WORK_DIR=/sing-box
 PORT=$START_PORT
@@ -702,6 +703,25 @@ EOF
 }
 EOF
 
+  # 动态计算 Argo 要连接的目标 URL
+  if [ "$ENABLE_SUBSCRIBE" != "false" ]; then
+    # 默认模式：连 Nginx
+    TUNNEL_URL="https://localhost:${START_PORT}"
+  else
+    # 无 Nginx 模式：寻找可用的 WebSocket 端口直接连
+    if [ "${VLESS_WS}" = 'true' ]; then
+      TUNNEL_URL="http://localhost:${PORT_VLESS_WS}"
+    elif [ "${VMESS_WS}" = 'true' ]; then
+      TUNNEL_URL="http://localhost:${PORT_VMESS_WS}"
+    elif [ "${H2_REALITY}" = 'true' ]; then
+      TUNNEL_URL="http://localhost:${PORT_H2_REALITY}"
+    else
+      # 没开启兼容协议，Argo 会报错，但至少不会泄露订阅
+      TUNNEL_URL="http_status:404"
+      echo "警告：已关闭 Nginx 且未检测到 WS/HTTP 协议，Argo 隧道可能无法通网！"
+    fi
+  fi
+
   # 判断 argo 隧道类型
   if [[ -n "$ARGO_DOMAIN" && -n "$ARGO_AUTH" ]]; then
     if [[ "$ARGO_AUTH" =~ TunnelSecret ]]; then
@@ -714,9 +734,9 @@ credentials-file: ${WORK_DIR}/tunnel.json
 
 ingress:
   - hostname: ${ARGO_DOMAIN}
-    service: https://localhost:${START_PORT}
+    service: ${TUNNEL_URL}
     originRequest:
-      noTLSVerify: false
+      noTLSVerify: true
   - service: http_status:404
 EOF
 
@@ -727,15 +747,20 @@ EOF
   else
     ((PORT++))
     METRICS_PORT=$PORT
-    ARGO_RUNS="cloudflared tunnel --edge-ip-version auto --no-autoupdate --no-tls-verify --metrics 0.0.0.0:$METRICS_PORT --url https://localhost:$START_PORT"
+    ARGO_RUNS="cloudflared tunnel --edge-ip-version auto --no-autoupdate --no-tls-verify --metrics 0.0.0.0:$METRICS_PORT --url ${TUNNEL_URL}"
   fi
 
-  # 生成 s6-overlay 服务脚本（替代 supervisord）
-  mkdir -p /etc/services.d/nginx /etc/services.d/sing-box
-  cat > /etc/services.d/nginx/run << 'EOF'
+  # 生成 s6-overlay 服务脚本
+  # [修改] Nginx 服务只在开启订阅时生成
+  mkdir -p /etc/services.d/sing-box
+  if [ "$ENABLE_SUBSCRIBE" != "false" ]; then
+      mkdir -p /etc/services.d/nginx
+      cat > /etc/services.d/nginx/run << 'EOF'
 #!/usr/bin/env sh
 exec /usr/sbin/nginx -g 'daemon off;'
 EOF
+      chmod +x /etc/services.d/nginx/run
+  fi
   cat > /etc/services.d/sing-box/run << EOF
 #!/usr/bin/env sh
 exec ${WORK_DIR}/sing-box run -C ${WORK_DIR}/conf/
@@ -764,109 +789,112 @@ EOF
   local SELF_SIGNED_FINGERPRINT_SHA256=$(openssl x509 -fingerprint -noout -sha256 -in ${WORK_DIR}/cert/cert.pem | awk -F '=' '{print $NF}')
   local SELF_SIGNED_FINGERPRINT_BASE64=$(openssl x509 -in ${WORK_DIR}/cert/cert.pem -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl enc -base64)
 
-  # 生成 nginx 配置文件
-  local NGINX_CONF="user root;
+  # Nginx 配置文件只在开启订阅时生成
+  if [ "$ENABLE_SUBSCRIBE" != "false" ]; then
+    # 生成 nginx 配置文件
+    local NGINX_CONF="user root;
 
-  worker_processes auto;
+    worker_processes auto;
 
-  error_log  /dev/null;
-  pid        /var/run/nginx.pid;
+    error_log  /dev/null;
+    pid        /var/run/nginx.pid;
 
-  events {
-      worker_connections  1024;
-  }
-
-  http {
-    map \$http_user_agent \$path {
-      default                    /;                # 默认路径
-      ~*v2rayN|Neko              /base64;          # 匹配 V2rayN / NekoBox 客户端
-      ~*clash                    /clash;           # 匹配 Clash 客户端
-      ~*ShadowRocket             /shadowrocket;    # 匹配 ShadowRocket  客户端
-      ~*SFM                      /sing-box-pc;     # 匹配 Sing-box pc 客户端
-      ~*SFI|SFA                  /sing-box-phone;  # 匹配 Sing-box phone 客户端
-   #   ~*Chrome|Firefox|Mozilla  /;                # 添加更多的分流规则
+    events {
+        worker_connections  1024;
     }
 
-      include       /etc/nginx/mime.types;
-      default_type  application/octet-stream;
-
-      log_format  main  '\$remote_addr - \$remote_user [\$time_local] "\$request" '
-                        '\$status \$body_bytes_sent "\$http_referer" '
-                        '"\$http_user_agent" "\$http_x_forwarded_for"';
-
-      access_log  /dev/null;
-
-      sendfile        on;
-      #tcp_nopush     on;
-
-      keepalive_timeout  65;
-
-      #gzip  on;
-
-      #include /etc/nginx/conf.d/*.conf;
-
-    server {
-      listen 127.0.0.1:$START_PORT;
-      # listen 127.0.0.1:$START_PORT ssl ; # sing-box backend
-      # http2 on;
-      server_name addons.mozilla.org;
-
-      # ssl_certificate            ${WORK_DIR}/cert/cert.pem;
-      # ssl_certificate_key        ${WORK_DIR}/cert/private.key;
-      # ssl_protocols              TLSv1.3;
-      # ssl_session_tickets        on;
-      # ssl_stapling               off;
-      # ssl_stapling_verify        off;"
-
-  [ "${VLESS_WS}" = 'true' ] && NGINX_CONF+="
-      # 反代 sing-box vless websocket
-      location /${UUID}-vless {
-        if (\$http_upgrade != "websocket") {
-           return 404;
-        }
-        proxy_pass                          http://127.0.0.1:${PORT_VLESS_WS};
-        proxy_http_version                  1.1;
-        proxy_set_header Upgrade            \$http_upgrade;
-        proxy_set_header Connection         "upgrade";
-        proxy_set_header X-Real-IP          \$remote_addr;
-        proxy_set_header X-Forwarded-For    \$proxy_add_x_forwarded_for;
-        proxy_set_header Host               \$host;
-        proxy_redirect                      off;
-      }"
-
-  [ "${VMESS_WS}" = 'true' ] && NGINX_CONF+="
-      # 反代 sing-box websocket
-      location /${UUID}-vmess {
-        if (\$http_upgrade != "websocket") {
-           return 404;
-        }
-        proxy_pass                          http://127.0.0.1:${PORT_VMESS_WS};
-        proxy_http_version                  1.1;
-        proxy_set_header Upgrade            \$http_upgrade;
-        proxy_set_header Connection         "upgrade";
-        proxy_set_header X-Real-IP          \$remote_addr;
-        proxy_set_header X-Forwarded-For    \$proxy_add_x_forwarded_for;
-        proxy_set_header Host               \$host;
-        proxy_redirect                      off;
-      }"
-
-  NGINX_CONF+="
-      # 来自 /auto 的分流
-      location ~ ^/${UUID}/auto {
-        default_type 'text/plain; charset=utf-8';
-        alias ${WORK_DIR}/subscribe/\$path;
+    http {
+      map \$http_user_agent \$path {
+        default                    /;                # 默认路径
+        ~*v2rayN|Neko              /base64;          # 匹配 V2rayN / NekoBox 客户端
+        ~*clash                    /clash;           # 匹配 Clash 客户端
+        ~*ShadowRocket             /shadowrocket;    # 匹配 ShadowRocket  客户端
+        ~*SFM                      /sing-box-pc;     # 匹配 Sing-box pc 客户端
+        ~*SFI|SFA                  /sing-box-phone;  # 匹配 Sing-box phone 客户端
+    #   ~*Chrome|Firefox|Mozilla  /;                # 添加更多的分流规则
       }
 
-      location ~ ^/${UUID}/(.*) {
-        autoindex on;
-        proxy_set_header X-Real-IP \$proxy_protocol_addr;
-        default_type 'text/plain; charset=utf-8';
-        alias ${WORK_DIR}/subscribe/\$1;
-      }
-    }
-  }"
+        include       /etc/nginx/mime.types;
+        default_type  application/octet-stream;
 
-  echo "$NGINX_CONF" > /etc/nginx/nginx.conf
+        log_format  main  '\$remote_addr - \$remote_user [\$time_local] "\$request" '
+                          '\$status \$body_bytes_sent "\$http_referer" '
+                          '"\$http_user_agent" "\$http_x_forwarded_for"';
+
+        access_log  /dev/null;
+
+        sendfile        on;
+        #tcp_nopush     on;
+
+        keepalive_timeout  65;
+
+        #gzip  on;
+
+        #include /etc/nginx/conf.d/*.conf;
+
+      server {
+        listen 127.0.0.1:$START_PORT;
+        # listen 127.0.0.1:$START_PORT ssl ; # sing-box backend
+        # http2 on;
+        server_name addons.mozilla.org;
+
+        # ssl_certificate            ${WORK_DIR}/cert/cert.pem;
+        # ssl_certificate_key        ${WORK_DIR}/cert/private.key;
+        # ssl_protocols              TLSv1.3;
+        # ssl_session_tickets        on;
+        # ssl_stapling               off;
+        # ssl_stapling_verify        off;"
+
+    [ "${VLESS_WS}" = 'true' ] && NGINX_CONF+="
+        # 反代 sing-box vless websocket
+        location /${UUID}-vless {
+          if (\$http_upgrade != "websocket") {
+            return 404;
+          }
+          proxy_pass                          http://127.0.0.1:${PORT_VLESS_WS};
+          proxy_http_version                  1.1;
+          proxy_set_header Upgrade            \$http_upgrade;
+          proxy_set_header Connection         "upgrade";
+          proxy_set_header X-Real-IP          \$remote_addr;
+          proxy_set_header X-Forwarded-For    \$proxy_add_x_forwarded_for;
+          proxy_set_header Host               \$host;
+          proxy_redirect                      off;
+        }"
+
+    [ "${VMESS_WS}" = 'true' ] && NGINX_CONF+="
+        # 反代 sing-box websocket
+        location /${UUID}-vmess {
+          if (\$http_upgrade != "websocket") {
+            return 404;
+          }
+          proxy_pass                          http://127.0.0.1:${PORT_VMESS_WS};
+          proxy_http_version                  1.1;
+          proxy_set_header Upgrade            \$http_upgrade;
+          proxy_set_header Connection         "upgrade";
+          proxy_set_header X-Real-IP          \$remote_addr;
+          proxy_set_header X-Forwarded-For    \$proxy_add_x_forwarded_for;
+          proxy_set_header Host               \$host;
+          proxy_redirect                      off;
+        }"
+
+    NGINX_CONF+="
+        # 来自 /auto 的分流
+        location ~ ^/${UUID}/auto {
+          default_type 'text/plain; charset=utf-8';
+          alias ${WORK_DIR}/subscribe/\$path;
+        }
+
+        location ~ ^/${UUID}/(.*) {
+          autoindex on;
+          proxy_set_header X-Real-IP \$proxy_protocol_addr;
+          default_type 'text/plain; charset=utf-8';
+          alias ${WORK_DIR}/subscribe/\$1;
+        }
+      }
+    }"
+
+    echo "$NGINX_CONF" > /etc/nginx/nginx.conf
+  fi
 
   # IPv6 时的 IP 处理
   if [[ "$SERVER_IP" =~ : ]]; then
