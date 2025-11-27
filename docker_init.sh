@@ -710,11 +710,13 @@ EOF
   else
     # 无 Nginx 模式：寻找可用的 WebSocket 端口直接连
     if [ "${VLESS_WS}" = 'true' ]; then
-      TUNNEL_URL="https://localhost:${PORT_VLESS_WS}"
+      TUNNEL_URL="http://localhost:${PORT_VLESS_WS}"
+      info "Argo 将直接回源至 VLESS-WS 端口 (HTTPS): ${PORT_VLESS_WS}"
     elif [ "${VMESS_WS}" = 'true' ]; then
-      TUNNEL_URL="https://localhost:${PORT_VMESS_WS}"
+      TUNNEL_URL="http://localhost:${PORT_VMESS_WS}"
+      info "Argo 将直接回源至 VMESS-WS 端口 (HTTP): ${PORT_VMESS_WS}"
     elif [ "${H2_REALITY}" = 'true' ]; then
-      TUNNEL_URL="https://localhost:${PORT_H2_REALITY}"
+      TUNNEL_URL="http://localhost:${PORT_H2_REALITY}"
     else
       # 没开启兼容协议，Argo 会报错，但至少不会泄露订阅
       TUNNEL_URL="http_status:404"
