@@ -3,12 +3,11 @@ name: Sync Upstream & Build Docker
 on:
   schedule:
     - cron: '0 18 * * *' # 每天北京时间凌晨 2:00 自动检查并构建
-  workflow_dispatch:     # 允许在 GitHub 网页上手动点击按钮立即构建
+  workflow_dispatch:     # 网页上手动点击立即运行
   push:
-    branches: [ main ]   # 代码有提交时触发
+    branches: [ main ]
 
 jobs:
-  # 1. 自动同步上游最新代码
   sync-upstream:
     runs-on: ubuntu-latest
     steps:
@@ -26,17 +25,20 @@ jobs:
           git merge upstream/main --allow-unrelated-histories -m "Auto sync upstream" || git rebase upstream/main || true
           git push origin main || true
 
-  # 2. 构建镜像并自动清理冗余副本
   build-and-push:
     needs: sync-upstream
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write   # 必须赋予 Packages 写入和删除权限
+      packages: write
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+
+      # 安装 QEMU（如果构建多架构必须开启，单架构也完全无害）
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -48,7 +50,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # 自动生成 latest 和 7 位短 sha 标签
       - name: Extract Docker metadata
         id: meta
         uses: docker/metadata-action@v5
@@ -65,13 +66,14 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
+          platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      # 核心优化：只保留最新的 10 个副本，清除历史无用垃圾镜像
+      # 自动清理保留最新的 10 个副本
       - name: Cleanup old container images (Keep 10)
         uses: dataaxiom/ghcr-cleanup-action@v1
         with:
-          keep-n-tagged: 10          # 严格只保留最新的 10 个带 tag 副本
-          delete-untagged: true      # 强制清除被覆盖/无标签的孤立层
-          delete-partial-images: true # 清理残缺的多架构层
+          keep-n-tagged: 10
+          delete-untagged: true
+          delete-partial-images: true
