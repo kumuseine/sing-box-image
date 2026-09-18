@@ -16,6 +16,8 @@ RUN set -ex && \
 
 # 运行阶段：保持最小体积
 FROM alpine:latest
+ARG TARGETARCH
+ENV ARCH=$TARGETARCH
 WORKDIR /sing-box
 
 # 只把解压好的 s6 系统文件考过来，不带任何 builder 垃圾
