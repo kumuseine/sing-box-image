@@ -2,10 +2,10 @@ name: Sync Upstream & Build Docker
 
 on:
   schedule:
-    - cron: '0 18 * * *' # 每天北京时间凌晨 2:00 自动检查并构建一次
-  workflow_dispatch:     # 允许你在网页上手动点击按钮立即构建
+    - cron: '0 18 * * *' # 每天北京时间凌晨 2:00 自动检查并构建
+  workflow_dispatch:     # 允许在 GitHub 网页上手动点击按钮立即构建
   push:
-    branches: [ main ]   # 当代码更新时触发
+    branches: [ main ]   # 代码有提交时触发
 
 jobs:
   # 1. 自动同步上游最新代码
@@ -26,13 +26,13 @@ jobs:
           git merge upstream/main --allow-unrelated-histories -m "Auto sync upstream" || git rebase upstream/main || true
           git push origin main || true
 
-  # 2. 构建 Docker 镜像并推送到 GHCR
+  # 2. 构建镜像并自动清理冗余副本
   build-and-push:
     needs: sync-upstream
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
+      packages: write   # 必须赋予 Packages 写入和删除权限
 
     steps:
       - name: Checkout repo
@@ -48,12 +48,30 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # 自动生成 latest 和 7 位短 sha 标签
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=raw,value=latest
+            type=sha,format=short
+
+      # 构建并推送到 GHCR
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:sha-${{ github.sha }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      # 核心优化：只保留最新的 10 个副本，清除历史无用垃圾镜像
+      - name: Cleanup old container images (Keep 10)
+        uses: dataaxiom/ghcr-cleanup-action@v1
+        with:
+          keep-n-tagged: 10          # 严格只保留最新的 10 个带 tag 副本
+          delete-untagged: true      # 强制清除被覆盖/无标签的孤立层
+          delete-partial-images: true # 清理残缺的多架构层
