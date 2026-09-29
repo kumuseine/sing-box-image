@@ -2,7 +2,7 @@ name: Sync Upstream & Build Docker
 
 on:
   schedule:
-    - cron: '0 18 * * *' # 每天北京时间凌晨 2:00 自动检查
+    - cron: '0 18 * * *' # 每天北京时间凌晨 2:00 自动检查上游脚本
   workflow_dispatch:     # 网页上手动点击立即运行
   push:
     branches: [ main ]
@@ -10,6 +10,7 @@ on:
       - 'README.md'
       - '.gitignore'
 
+# 权限配置：写代码库（用于同步）+ 写容器包（用于 GHCR）
 permissions:
   contents: write
   packages: write
@@ -18,63 +19,29 @@ jobs:
   check-and-sync:
     runs-on: ubuntu-latest
     outputs:
-      needs_build: ${{ steps.eval-trigger.outputs.needs_build }}
-      core_tag: ${{ steps.check-core.outputs.core_tag }}
-      core_updated: ${{ steps.check-core.outputs.core_updated }}
+      needs_build: ${{ steps.check-script.outputs.needs_build }}
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # 获取完整历史以便比对 Tag 和提交
+          fetch-depth: 0 # 完整历史比对
 
       - name: Configure Git Bot
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      # 1. 精确捕获 sing-box 最高版本内核（通杀 alpha / beta / rc / 正式版）
-      - name: Check sing-box Core Upstream (Bleeding Edge)
-        id: check-core
-        run: |
-          # 请求最近 30 个 releases，过滤出合法版本，用 sort -Vr 逆序排列取出最大语义版本号
-          LATEST_CORE=$(curl -sSL \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/SagerNet/sing-box/releases?per_page=30" | \
-            jq -r '.[].tag_name // empty' | \
-            grep -E '^v?[0-9]' | \
-            sort -Vr | head -n 1)
-
-          echo "Target Bleeding-edge Core Tag: $LATEST_CORE"
-
-          if [ -n "$LATEST_CORE" ]; then
-            # 用本地 Git Tag 做状态哨兵 (如 core-v1.15.0-alpha.1)
-            if ! git rev-parse "refs/tags/core-${LATEST_CORE}" >/dev/null 2>&1; then
-              echo "Found NEW sing-box core: $LATEST_CORE"
-              echo "core_updated=true" >> "$GITHUB_OUTPUT"
-              echo "core_tag=$LATEST_CORE" >> "$GITHUB_OUTPUT"
-            else
-              echo "Core $LATEST_CORE is already built and tagged."
-              echo "core_updated=false" >> "$GITHUB_OUTPUT"
-              echo "core_tag=$LATEST_CORE" >> "$GITHUB_OUTPUT"
-            fi
-          else
-            echo "::warning::Failed to fetch official sing-box release. Skipping core check."
-            echo "core_updated=false" >> "$GITHUB_OUTPUT"
-            echo "core_tag=" >> "$GITHUB_OUTPUT"
-          fi
-
-      # 2. 检查并同步 fscarmen/sing-box 脚本上游（沙盒隔离工作流）
+      # 检查并同步 fscarmen/sing-box 脚本上游（沙盒隔离上游的所有工作流）
       - name: Check and Sync Script Upstream
         id: check-script
         run: |
           git remote add upstream https://github.com/fscarmen/sing-box.git || true
           git fetch upstream main
 
-          # 比对上游是否有新 Commit
+          # 比对上游 Commit 差异
           NEW_COMMITS=$(git rev-list HEAD..upstream/main --count)
-          echo "Upstream commits behind: $NEW_COMMITS"
+          echo "Upstream commits count: $NEW_COMMITS"
 
           if [ "$NEW_COMMITS" -gt 0 ]; then
             echo "Upstream updates detected! Merging with workflow isolation..."
@@ -82,59 +49,46 @@ jobs:
             # 执行合并不自动提交
             git merge --no-commit --no-ff upstream/main || true
 
-            # 核心防御：强行还原 .github 目录并清理上游引入的新 workflow 文件（如 mirror.yml）
+            # 核心防御：彻底还原 .github 目录，阻断上游的 mirror.yml 等无用工作流
             git reset HEAD .github/
             git checkout HEAD -- .github/
             git clean -fd .github/
             rm -f .github/workflows/mirror.yml
 
-            # 检查剔除上游 CI 后，是否有实际项目代码改动
+            # 判定：剔除上游 CI 后，是否有实际项目代码改动（Dockerfile, docker_init.sh 等）
             if ! git diff --cached --quiet || ! git diff --quiet; then
-              echo "Legitimate upstream code changes detected. Committing..."
+              echo "Legitimate code changes detected. Committing..."
               git add -A
               git commit -m "chore: auto-sync upstream (exclude upstream workflows) [skip ci]"
               git push origin main
-              echo "script_updated=true" >> "$GITHUB_OUTPUT"
+              echo "needs_build=true" >> "$GITHUB_OUTPUT"
             else
-              echo "Upstream only modified CI/workflows. No project code changed."
+              echo "Upstream only modified workflows/CI. No actual code changed."
               git merge --abort || true
-              echo "script_updated=false" >> "$GITHUB_OUTPUT"
+              echo "needs_build=false" >> "$GITHUB_OUTPUT"
             fi
           else
             echo "No changes in upstream script repo."
-            echo "script_updated=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      # 3. 门禁决策
-      - name: Evaluate Build Conditions
-        id: eval-trigger
-        run: |
-          SCRIPT_UPDATED="${{ steps.check-script.outputs.script_updated }}"
-          CORE_UPDATED="${{ steps.check-core.outputs.core_updated }}"
-
-          if [ "$SCRIPT_UPDATED" = "true" ] || [ "$CORE_UPDATED" = "true" ]; then
-            echo "needs_build=true" >> "$GITHUB_OUTPUT"
-          else
             echo "needs_build=false" >> "$GITHUB_OUTPUT"
           fi
 
   build-and-push:
     needs: check-and-sync
-    # 门禁条件：有任一更新、手动网页触发、或手动 push 代码时才运行
+    # 门禁条件：脚本有更新、手动在网页触发、或你自己手动提交代码时才运行构建
     if: |
       needs.check-and-sync.outputs.needs_build == 'true' ||
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'push' && !contains(github.event.head_commit.message, '[skip ci]'))
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       packages: write
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      # 安装 QEMU 以支持多架构编译 (AMD64 & ARM64)
+      # 安装 QEMU 以支持多架构 (AMD64 & ARM64)
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -148,7 +102,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # 自动生成镜像 Tags (latest、版本号、以及 Short SHA)
+      # 自动生成镜像 Tags (latest 与 commit short sha)
       - name: Extract Docker metadata
         id: meta
         uses: docker/metadata-action@v5
@@ -156,10 +110,9 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           tags: |
             type=raw,value=latest
-            type=raw,value=${{ needs.check-and-sync.outputs.core_tag }},enable=${{ needs.check-and-sync.outputs.core_tag != '' }}
             type=sha,format=short
 
-      # 构建并推送双架构镜像，带 GHA 缓存提速
+      # 构建并推送双架构镜像，带 GHA 缓存极速复用
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
         with:
@@ -172,17 +125,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # 成功后写入 Tag 哨兵，防止下次定时检查重复构建
-      - name: Record Built Core Tag
-        if: ${{ needs.check-and-sync.outputs.core_updated == 'true' && needs.check-and-sync.outputs.core_tag != '' }}
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          TAG_NAME="core-${{ needs.check-and-sync.outputs.core_tag }}"
-          git tag "$TAG_NAME"
-          git push origin "$TAG_NAME" || true
-
-      # 自动清理过时的旧镜像版本（保留最新 10 个副本）
+      # 自动清理旧镜像，保留最新的 10 个副本
       - name: Cleanup old container images (Keep 10)
         uses: dataaxiom/ghcr-cleanup-action@v1
         with:
