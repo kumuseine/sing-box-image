@@ -24,15 +24,17 @@
 
 * * *
 ## 1.更新信息
+2026.10.13 v1.3.26 1. insert iptables / ip6tables allow rules before the first REJECT/DROP in INPUT instead of appending to the chain tail, which left node and nginx ports unreachable on images such as Oracle OCI and OpenVZ. https://github.com/fscarmen/sing-box/issues/353; 2. read the latest sing-box version from releases.atom (~11 KB) instead of the GitHub releases API (~10 MB), with the API and DEFAULT_NEWEST_VERSION as fallbacks, so an empty version no longer aborts install or upgrade. https://github.com/fscarmen/sing-box/issues/355; 1. iptables / ip6tables 放行规则改为插入 INPUT链第一条 REJECT/DROP 之前，不再追加到链尾，修复甲骨文 OCI、OpenVZ 等镜像上节点端口与 nginx 端口无法访问的问题。https://github.com/fscarmen/sing-box/issues/353; 2. 最新版本号改从 releases.atom 获取（约 11 KB），替代返回约 10 MB 的 github api，api 与 DEFAULT_NEWEST_VERSION 作为兜底，取不到版本号导致安装或升级中断的问题不再发生。 https://github.com/fscarmen/sing-box/issues/355
+
 2026.09.16 v1.3.25 Add Hysteria2 ignore_client_bandwidth toggle in [sb -d], default off; [sb -d] 新增 Hysteria2 ignore_client_bandwidth 开关，新安装默认关闭
 
 2026.08.21 v1.3.24 1. Add no-TUN environment support; 2. Fix Alpine OpenRC service stop error; 1. 新增无 TUN 环境支持; 2. 修复 Alpine OpenRC 服务停止误报
 
-2026.08.14 v1.3.23 Force HTTP/2 transport for cloudflared tunnels; cloudflared 隧道统一使用 HTTP/2 传输
-
 <details>
     <summary>历史更新 history（点击即可展开或收起）</summary>
 <br>
+
+>2026.08.14 v1.3.23 Force HTTP/2 transport for cloudflared tunnels; cloudflared 隧道统一使用 HTTP/2 传>输
 
 >2026.08.11 v1.3.22 make Hysteria2 Realm and port hopping mutually exclusive with confirm prompts in install and [sb -d]; 安装与 [sb -d] 修改链路中 Realm 与端口跳跃互斥，切换前均先提示确认
 >

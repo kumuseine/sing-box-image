@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # 当前脚本版本号
-VERSION='v1.3.25 (2026.09.18)'
+VERSION='v1.3.26 (2026.10.13)'
 
 # Github 反代加速代理
 GITHUB_PROXY=('https://hub.glowp.xyz/' 'https://proxy.vvvv.ee/')
@@ -22,7 +22,7 @@ NODE_TAG=("xtls-reality" "hysteria2" "tuic" "ShadowTLS" "shadowsocks" "trojan" "
 CONSECUTIVE_PORTS=${#PROTOCOL_LIST[@]}
 CDN_DOMAIN=("skk.moe" "ip.sb" "time.is" "cfip.xxxxxxxx.tk" "bestcf.top" "cdn.2020111.xyz" "xn--b6gac.eu.org" "cf.090227.xyz")
 SUBSCRIBE_TEMPLATE="https://raw.githubusercontent.com/fscarmen/client_template/main"
-DEFAULT_NEWEST_VERSION='1.15.0-alpha.6'
+DEFAULT_NEWEST_VERSION='1.15.0-alpha.12'
 FINGER_PRINT='chrome'
 STEP_NUM=0      # 当前步骤编号（安装流程中动态递增）
 TOTAL_STEPS=''  # 总步骤数（协议确定后动态计算）
@@ -40,8 +40,8 @@ mkdir -p "$TEMP_DIR"
 
 E[0]="Language:\n 1. English (default) \n 2. 简体中文"
 C[0]="${E[0]}"
-E[1]="Add Hysteria2 ignore_client_bandwidth toggle in [sb -d], default off"
-C[1]="[sb -d] 新增 Hysteria2 ignore_client_bandwidth 开关，新安装默认关闭"
+E[1]="Fix the firewall allow rules being appended after an existing REJECT/DROP rule on the INPUT chain, which left node and nginx ports unreachable on images such as Oracle OCI and OpenVZ; the rules are now inserted before the first REJECT/DROP rule. ufw / firewalld hosts are not affected, as those place allow rules ahead of any terminal rule by design. 2. Fix occasional empty version detection when checking for sing-box updates, which could abort installation or upgrade; the version is now read from the lightweight releases.atom feed first, with the GitHub API as fallback"
+C[1]="修复入站放行规则被追加到 INPUT 链已有的 REJECT/DROP 规则之后，导致甲骨文 OCI、OpenVZ 等镜像上节点端口与 nginx 端口无法访问的问题；放行规则现改为插入到第一条 REJECT/DROP 规则之前。ufw / firewalld 机器不受影响，这类防火墙本身就把放行规则放在终结规则之前。2. 修复检测 sing-box 更新时偶尔取不到最新版本号、导致安装或升级中断的问题；改为优先从体积很小的 releases.atom 获取，github api 作为兜底"
 E[2]="Downloading Sing-box. Please wait a seconds ..."
 C[2]="下载 Sing-box 中，请稍等 ..."
 E[3]="Input errors up to 5 times.The script is aborted."
@@ -420,6 +420,10 @@ E[189]="Enabled. ignore_client_bandwidth: true -> commands clients to use the BB
 C[189]="已启用。ignore_client_bandwidth: true —— 命令客户端使用 BBR 拥塞控制而非 Hysteria CC（未设置 up/down）。客户端订阅不再包含 up/down。"
 E[190]="Disabled. When up_mbps/down_mbps are set, clients are denied to use the BBR CC"
 C[190]="已关闭。当设置 up/down 时，禁止客户端使用 BBR 拥塞控制"
+E[191]="Firewall: the allow rules were inserted before the final REJECT/DROP rule on the INPUT chain, so they now take effect."
+C[191]="防火墙：入站放行规则已插入到 INPUT 链末尾的 REJECT/DROP 规则之前，现已生效。"
+E[192]="Firewall: that REJECT/DROP rule carries match conditions, so the allow rules are not restricted by them. Adjust it manually if this is not intended."
+C[192]="防火墙：该 REJECT/DROP 规则带有匹配条件，放行规则不受其限制。如非预期，请自行调整该规则。"
 
 # 自定义字体彩色，read 函数
 warning() { echo -e "\033[31m\033[01m$*\033[0m"; }  # 红色
@@ -2537,18 +2541,18 @@ check_system_info() {
 
 # 获取 sing-box 最新版本
 get_sing_box_version() {
+  local FORCE_VERSION RESULT_VERSION
   # FORCE_VERSION 用于在 sing-box 某个主程序出现 bug 时，强制为指定版本，以防止运行出错
-  local FORCE_VERSION=$(wget --no-check-certificate --tries=2 --timeout=3 -qO- ${GH_PROXY}https://raw.githubusercontent.com/fscarmen/sing-box/refs/heads/main/force_version | sed 's/^[vV]//g; s/\r//g')
+  FORCE_VERSION=$(wget --no-check-certificate --tries=2 --timeout=3 -qO- "${GH_PROXY}https://raw.githubusercontent.com/fscarmen/sing-box/refs/heads/main/force_version" 2>&1 | sed 's/^[vV]//g; s/\r//g')
   if grep -q '.' <<< "$FORCE_VERSION"; then
-    local RESULT_VERSION="$FORCE_VERSION"
+    RESULT_VERSION="$FORCE_VERSION"
   else
-    # 先判断 github api 返回 http 状态码是否为 200，有时候 IP 会被限制，导致获取不到最新版本
-    local API_RESPONSE=$(wget --no-check-certificate --server-response --tries=2 --timeout=3 -qO- "${GH_PROXY}https://api.github.com/repos/SagerNet/sing-box/releases" 2>&1 | grep -E '^[ ]+HTTP/|tag_name')
-    if grep -q 'HTTP.* 200' <<< "$API_RESPONSE"; then
-      local VERSION_LATEST=$(awk -F '["v-]' '/tag_name/{print $5}' <<< "$API_RESPONSE" | sort -Vr | sed -n '1p')
-      local RESULT_VERSION=$(awk -F '["v]' -v var="tag_name.*$VERSION_LATEST" '$0 ~ var {print $5; exit}' <<< "$API_RESPONSE")
-    else
-      local RESULT_VERSION="$DEFAULT_NEWEST_VERSION"
+    # 取最新版本（含 alpha / beta / rc 等预发布版）：releases.atom → 失败则 GitHub API → 仍失败则 DEFAULT_NEWEST_VERSION
+    RESULT_VERSION=$(wget --no-check-certificate --tries=2 --timeout=3 -qO- "${GH_PROXY}https://github.com/SagerNet/sing-box/releases.atom" 2>&1 | sed -n '/alternate/ s#.*/tag/v\([^"]\+\)".*#\1#gp' | sort -Vr | sed -n '1p')
+
+    if grep -q '^$' <<< "$RESULT_VERSION"; then
+      RESULT_VERSION=$(wget --no-check-certificate --tries=2 --timeout=3 -qO- "${GH_PROXY}https://api.github.com/repos/SagerNet/sing-box/releases" 2>&1 | awk -F '["v]' '/"tag_name"/ {print $5}' | sort -Vr | sed -n '1p')
+      grep -q '^$' <<< "$RESULT_VERSION" && RESULT_VERSION="$DEFAULT_NEWEST_VERSION"
     fi
   fi
   echo "$RESULT_VERSION"
@@ -3540,19 +3544,65 @@ del_service_port_rule_firewalld() {
   firewall-cmd --zone=public --remove-port=${PORT}/${PROTO} --permanent >/dev/null 2>&1
 }
 
+# 判断一条 iptables 规则是否带匹配条件，返回 0 = 带条件
+# $1 = iptables -S 输出的单行完整 spec，例如 "-A INPUT -i eth0 -j DROP"
+rule_spec_has_condition() {
+  local SPEC=$1
+  local REST=$(printf '%s\n' "$SPEC" | sed -E 's/^-A INPUT //; s/^-j (REJECT|DROP)( --reject-with [^ ]+)?$//')
+  [ -n "$REST" ]
+}
+
+# 定位 INPUT 链第一条终止规则（REJECT / DROP）
+# $1 = iptables | ip6tables
+# 通过全局变量回传，不能用 stdout + 命令替换，否则赋值会落在子 shell 中丢失：
+# 行号取空后调用方会静默退回链尾追加，修复失效且无任何报错
+# 全局输出:TERMINAL_LINE / TERMINAL_RULE_SPEC / TERMINAL_HAS_CONDITION
+# 返回:0 = 找到；1 = 无终止规则或命令不可用（调用方退回链尾追加）
+iptables_input_terminal_line() {
+  local CMD=$1 OUT
+  TERMINAL_LINE=''; TERMINAL_RULE_SPEC=''; TERMINAL_HAS_CONDITION=no
+
+  command -v "$CMD" >/dev/null 2>&1 || return 1
+  OUT=$("$CMD" -S INPUT 2>/dev/null | awk '
+    /^-A INPUT/ {
+      n++
+      if (!found && $0 ~ /-j (REJECT|DROP)( |$)/) { found = n; spec = $0 }
+    }
+    END { if (found) printf "%d\t%s\n", found, spec }
+  ') || return 1
+  [ -n "$OUT" ] || return 1
+
+  TERMINAL_LINE=${OUT%%$'\t'*}
+  TERMINAL_RULE_SPEC=${OUT#*$'\t'}
+  rule_spec_has_condition "$TERMINAL_RULE_SPEC" && TERMINAL_HAS_CONDITION=yes
+  return 0
+}
+
 # iptables 普通端口规则备注
+# 优先插入到 INPUT 链第一条 REJECT / DROP 之前；链上无终止规则或插入失败时退回链尾追加。
+# -C / -D 按规则内容匹配，与规则在链内的位置无关，因此插入位置改变后幂等与清理逻辑依然成立。
 add_service_port_rule_iptables() {
   local PROTO=$1
   local PORT=$2
   local COMMENT="Sing-box Family Bucket PORT ${PROTO} ${PORT}"
+  local CMD
 
   [ -z "$PROTO" ] || [ -z "$PORT" ] && return 1
 
-  iptables -C INPUT -p ${PROTO} --dport ${PORT} -m comment --comment "$COMMENT" -j ACCEPT >/dev/null 2>&1 || \
-  iptables -A INPUT -p ${PROTO} --dport ${PORT} -m comment --comment "$COMMENT" -j ACCEPT >/dev/null 2>&1
+  # v4 / v6 分别独立判断：两套链的原有规则可能不同，锚点必须各自计算
+  for CMD in iptables ip6tables; do
+    "$CMD" -C INPUT -p ${PROTO} --dport ${PORT} -m comment --comment "$COMMENT" -j ACCEPT >/dev/null 2>&1 && continue
 
-  ip6tables -C INPUT -p ${PROTO} --dport ${PORT} -m comment --comment "$COMMENT" -j ACCEPT >/dev/null 2>&1 || \
-  ip6tables -A INPUT -p ${PROTO} --dport ${PORT} -m comment --comment "$COMMENT" -j ACCEPT >/dev/null 2>&1
+    if iptables_input_terminal_line "$CMD"; then
+      if "$CMD" -I INPUT "$TERMINAL_LINE" -p ${PROTO} --dport ${PORT} -m comment --comment "$COMMENT" -j ACCEPT >/dev/null 2>&1; then
+        IPTABLES_INSERTED_BEFORE_TERMINAL=yes
+        [ "$TERMINAL_HAS_CONDITION" = 'yes' ] && IPTABLES_TERMINAL_CONDITIONAL=yes
+        continue
+      fi
+    fi
+
+    "$CMD" -A INPUT -p ${PROTO} --dport ${PORT} -m comment --comment "$COMMENT" -j ACCEPT >/dev/null 2>&1 || true
+  done
 }
 
 # 删除 iptables 普通端口规则
@@ -3720,6 +3770,9 @@ sync_firewall_rules() {
   : > "$SERVICE_FIREWALL_STATE_FILE"
   reload_or_save_firewall_rules
 
+  IPTABLES_INSERTED_BEFORE_TERMINAL=no
+  IPTABLES_TERMINAL_CONDITIONAL=no
+
   case "$FW_BACKEND" in
     ufw )
       for PORT in "${EXPOSED_TCP_PORTS[@]}"; do
@@ -3754,6 +3807,14 @@ sync_firewall_rules() {
   for PORT in "${EXPOSED_UDP_PORTS[@]}"; do
     [ -n "$PORT" ] && echo "udp $PORT" >> "$SERVICE_FIREWALL_STATE_FILE"
   done
+
+  case "$FW_BACKEND" in
+    alpine-iptables|iptables )
+      [ "$IPTABLES_INSERTED_BEFORE_TERMINAL" = 'yes' ] && hint "\n $(text 191) \n"
+      [ "$IPTABLES_TERMINAL_CONDITIONAL" = 'yes' ] && hint " $(text 192) \n"
+      ;;
+  esac
+
   reload_or_save_firewall_rules
 
   HY2_TARGET=$(awk -F '[:,]' '/"listen_port"/{gsub(/[[:space:]]/, "", $2); print $2; exit}' ${HY2_FILE} 2>/dev/null)
