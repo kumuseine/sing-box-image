@@ -40,8 +40,13 @@ mkdir -p "$TEMP_DIR"
 
 E[0]="Language:\n 1. English (default) \n 2. 简体中文"
 C[0]="${E[0]}"
+<<<<<<< HEAD
 E[1]="Fix the firewall allow rules being appended after an existing REJECT/DROP rule on the INPUT chain, which left node and nginx ports unreachable on images such as Oracle OCI and OpenVZ; the rules are now inserted before the first REJECT/DROP rule. ufw / firewalld hosts are not affected, as those place allow rules ahead of any terminal rule by design. 2. Fix occasional empty version detection when checking for sing-box updates, which could abort installation or upgrade; the version is now read from the lightweight releases.atom feed first, with the GitHub API as fallback"
 C[1]="修复入站放行规则被追加到 INPUT 链已有的 REJECT/DROP 规则之后，导致甲骨文 OCI、OpenVZ 等镜像上节点端口与 nginx 端口无法访问的问题；放行规则现改为插入到第一条 REJECT/DROP 规则之前。ufw / firewalld 机器不受影响，这类防火墙本身就把放行规则放在终结规则之前。2. 修复检测 sing-box 更新时偶尔取不到最新版本号、导致安装或升级中断的问题；改为优先从体积很小的 releases.atom 获取，github api 作为兜底"
+=======
+E[1]="Fix the firewall allow rules being appended after an existing REJECT/DROP rule on the INPUT chain, which left node and nginx ports unreachable on images such as Oracle OCI and OpenVZ; the rules are now inserted before the first REJECT/DROP rule. ufw / firewalld hosts are not affected, as those place allow rules ahead of any terminal rule by design. 2. Fix occasional empty version detection when checking for sing-box updates, which could abort installation or upgrade; the version is now read from the lightweight releases.atom feed first, with the GitHub API as fallback. 3. Enable readline line editing on interactive inputs: ← / → move the cursor, Home / End and Ctrl+A / Ctrl+E jump to line start / end, Ctrl+W deletes the previous word, Ctrl+U clears to line start, Ctrl+K deletes to line end, Ctrl+Y undoes the last deletion, Ctrl+L clears the screen; editing keys are no longer inserted into the value. 4. Make the uninstall path fully offline: sb -u no longer runs CDN detection and no longer pre-downloads subscription templates, binaries or cloudflared, so it completes immediately on hosts that cannot reach GitHub"
+C[1]="修复入站放行规则被追加到 INPUT 链已有的 REJECT/DROP 规则之后，导致甲骨文 OCI、OpenVZ 等镜像上节点端口与 nginx 端口无法访问的问题；放行规则现改为插入到第一条 REJECT/DROP 规则之前。ufw / firewalld 机器不受影响，这类防火墙本身就把放行规则放在终结规则之前。2. 修复检测 sing-box 更新时偶尔取不到最新版本号、导致安装或升级中断的问题；改为优先从体积很小的 releases.atom 获取，github api 作为兜底。3. 交互输入启用 readline 行编辑：← / → 移动光标，Home / End 与 Ctrl+A / Ctrl+E 跳到行首 / 行尾，Ctrl+W 删除光标前一个词，Ctrl+U 清空到行首，Ctrl+K 删除到行尾，Ctrl+Y 撤销上一次删除，Ctrl+L 清屏；方向键等编辑键不再被当作内容插入输入值。4. 卸载流程完全离线化：sb -u 不再执行 CDN 探测，也不再预下载订阅模板、二进制与 cloudflared，GitHub 不可达时也能立即完成卸载"
+>>>>>>> upstream/main
 E[2]="Downloading Sing-box. Please wait a seconds ..."
 C[2]="下载 Sing-box 中，请稍等 ..."
 E[3]="Input errors up to 5 times.The script is aborted."
@@ -430,7 +435,19 @@ warning() { echo -e "\033[31m\033[01m$*\033[0m"; }  # 红色
 error() { echo -e "\033[31m\033[01m$*\033[0m" && exit 1; } # 红色
 info() { echo -e "\033[32m\033[01m$*\033[0m"; }   # 绿色
 hint() { echo -e "\033[33m\033[01m$*\033[0m"; }   # 黄色
-reading() { read -rp "$(info "$1")" "$2"; }
+# readline 需要用 SOH / STX 包裹不可打印的 ANSI 转义才会算对光标位置，配色与 info 保持一致
+INFO_PROMPT_HEAD=$'\001\033[32m\033[01m\002'
+INFO_PROMPT_TAIL=$'\001\033[0m\002'
+# 交互终端下启用 readline 行编辑：方向键移动光标、Home / End、Delete、Ctrl+A / Ctrl+E / Ctrl+W；
+reading() {
+  local prompt
+  if [[ -t 0 ]]; then
+    printf -v prompt '%b' "$1"
+    read -er -p "$INFO_PROMPT_HEAD$prompt$INFO_PROMPT_TAIL" "$2"
+  else
+    read -rp "$(info "$1")" "$2"
+  fi
+}
 
 # 预处理：扫描 E/C 数组，把含 $ 的条目下标记录到关联数组，避免 text() 每次调用都启动 grep 子进程
 declare -A TEXT_NEEDS_EVAL
@@ -2279,15 +2296,18 @@ check_install() {
   fi
 
   # 并发下载订阅模板 (clash, clash2, sing-box-template)，在新安装和更换协议时会用到
-  {
-    wget --no-check-certificate --continue --tries=2 --timeout=10 -qO $TEMP_DIR/clash ${GH_PROXY}${SUBSCRIBE_TEMPLATE}/clash 2>/dev/null &
-    wget --no-check-certificate --continue --tries=2 --timeout=10 -qO $TEMP_DIR/clash2 ${GH_PROXY}${SUBSCRIBE_TEMPLATE}/clash2 2>/dev/null &
-    wget --no-check-certificate --continue --tries=2 --timeout=10 -qO $TEMP_DIR/sing-box-template ${GH_PROXY}${SUBSCRIBE_TEMPLATE}/sing-box 2>/dev/null &
-    wait
-  } &
+  # 卸载模式跳过：纯浪费，且网络不通时会白白等待
+  if [ "$IS_UNINSTALL" != 'is_uninstall' ]; then
+    {
+      wget --no-check-certificate --continue --tries=2 --timeout=10 -qO $TEMP_DIR/clash ${GH_PROXY}${SUBSCRIBE_TEMPLATE}/clash 2>/dev/null &
+      wget --no-check-certificate --continue --tries=2 --timeout=10 -qO $TEMP_DIR/clash2 ${GH_PROXY}${SUBSCRIBE_TEMPLATE}/clash2 2>/dev/null &
+      wget --no-check-certificate --continue --tries=2 --timeout=10 -qO $TEMP_DIR/sing-box-template ${GH_PROXY}${SUBSCRIBE_TEMPLATE}/sing-box 2>/dev/null &
+      wait
+    } &
+  fi
 
-  # 如果有需要，后台静默下载 sing-box
-  if [ "${STATUS[0]}" = "$(text 26)" ] && [ ! -s ${WORK_DIR}/sing-box ]; then
+  # 如果有需要，后台静默下载 sing-box（卸载模式跳过）
+  if [ "${STATUS[0]}" = "$(text 26)" ] && [ ! -s ${WORK_DIR}/sing-box ] && [ "$IS_UNINSTALL" != 'is_uninstall' ]; then
     # 任务 1: 下载 sing-box
     {
       local ONLINE=$(get_sing_box_version)
@@ -2360,8 +2380,8 @@ check_install() {
     fi
   fi
 
-  # 如果有需要，后台静默下载 cloudflared
-  if [[ "${STATUS[1]}" = "$(text 26)" || "$NONINTERACTIVE_INSTALL" = 'noninteractive_install' ]] && [ ! -s ${WORK_DIR}/cloudflared ]; then
+  # 如果有需要，后台静默下载 cloudflared（卸载模式跳过）
+  if [[ "${STATUS[1]}" = "$(text 26)" || "$NONINTERACTIVE_INSTALL" = 'noninteractive_install' ]] && [ ! -s ${WORK_DIR}/cloudflared ] && [ "$IS_UNINSTALL" != 'is_uninstall' ]; then
     {
       wget --no-check-certificate --tries=2 --timeout=10 -qO $TEMP_DIR/cloudflared ${GH_PROXY}https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-$ARGO_ARCH >/dev/null 2>&1 && chmod +x $TEMP_DIR/cloudflared >/dev/null 2>&1
     }&
@@ -2516,8 +2536,11 @@ check_system_info() {
 
   # 判断虚拟化
   if [ "$SYSTEM" = 'Alpine' ]; then
-    command -v virt-what >/dev/null 2>&1 || ${PACKAGE_INSTALL[int]} virt-what >/dev/null 2>&1
-    command -v virt-what >/dev/null 2>&1 && VIRT=$(virt-what | sed -n 1p) || VIRT=unknown
+    # 卸载时 VIRT 仅用于菜单展示，不显示菜单，故无需联网装 virt-what
+    if [ "$IS_UNINSTALL" != 'is_uninstall' ]; then
+      command -v virt-what >/dev/null 2>&1 || ${PACKAGE_INSTALL[int]} virt-what >/dev/null 2>&1
+      command -v virt-what >/dev/null 2>&1 && VIRT=$(virt-what | sed -n 1p) || VIRT=unknown
+    fi
   elif command -v systemd-detect-virt >/dev/null 2>&1; then
     VIRT=$(systemd-detect-virt)
   elif command -v hostnamectl >/dev/null 2>&1; then
@@ -6657,10 +6680,18 @@ menu() {
   fi
 }
 
-check_cdn
+# 卸载是纯本地操作：-U / -u 时置位，作为下方所有网络动作的总开关
+# 首尾补空格并用 [[:space:]] 锚定，避免 -UUID / --HY2_WARP 等含 -U 的长参数被误判
+[[ " ${*^^} " =~ [[:space:]]-U([[:space:]]|$) ]] && IS_UNINSTALL='is_uninstall'
+
+# 卸载是纯本地操作：跳过 CDN 探测，保证离线 / 弱网下立即进入卸载流程
+# 注：statistics_of_run_times 为运行统计，后台执行不阻塞卸载，必须与守卫分开成行保留
+[ "$IS_UNINSTALL" != 'is_uninstall' ] && check_cdn
 statistics_of_run_times update sing-box.sh 2>/dev/null
 
 ###### 为了给旧版本 04_experimental.json 补全 clash_api 配置并剥离 v2ray_api，将于 2026年12月31日移除
+# 卸载模式跳过：块内含服务重载 / kill -HUP，对即将删除的服务做无意义操作
+[ "$IS_UNINSTALL" != 'is_uninstall' ] && \
 if [ -x "$WORK_DIR/jq" ] && [ -s "$WORK_DIR/conf/04_experimental.json" ] && [ -x "$WORK_DIR/sing-box" ] && [[ "$(date +%Y%m%d)" < "20261231" ]]; then
   # 旧版本 04_experimental.json 可能缺 clash_api、或含 v2ray_api（旧版脚本注入的）。
   # clash_api 是官方 release 二进制默认编译功能（with_clash_api），直接补全；
@@ -6705,14 +6736,6 @@ if [ -x "$WORK_DIR/jq" ] && [ -s "$WORK_DIR/conf/04_experimental.json" ] && [ -x
   fi
 fi
 
-###### 为了把原来的 nekobox 换成 Throne 做的处理，将于 2026年9月30日移除
-if [ -s $WORK_DIR/nginx.conf ] && grep -q 'Neko|Throne' $WORK_DIR/nginx.conf; then
-  sed -i 's@~\*Neko|Throne.*@~*Throne|Neko              /throne;         # 匹配 Throne / Neko 客户端@g' "$WORK_DIR/nginx.conf"
-  [ -s $WORK_DIR/subscribe/neko ] && rm -f $WORK_DIR/subscribe/neko
-  cmd_systemctl restart sing-box
-  export_list >/dev/null 2>&1
-fi
-
 # 传参
 [[ "${*^^}" =~ '-E'|'-K' ]] && L=E
 [[ "${*^^}" =~ '-C'|'-B'|'-L' ]] && L=C
@@ -6743,6 +6766,10 @@ if [[ -n "$CONFIG_FILE" && -s "$CONFIG_FILE" ]]; then
   [ "$SUBSCRIBE" = 'true' ] && IS_SUB=is_sub || IS_SUB=no_sub
 fi
 
+# 卸载模式：仅在语言记录文件缺失时才预设 L=E，避免 select_language 弹交互；
+# 文件存在时必须保持 L 为空，让 select_language 正常读取，否则会跳过读取而固定输出英文。
+# L=${L:-E} 保证 -E / -C / --LANGUAGE 等显式指定仍然优先
+[ "$IS_UNINSTALL" = 'is_uninstall' ] && [ ! -s "${WORK_DIR}/language" ] && L=${L:-E}
 check_root
 select_language
 check_system_info
@@ -6799,6 +6826,7 @@ for z in ${!ALL_PARAMETER[@]}; do
       change_config; exit 0
       ;;
     -U )
+      # 归属校验复用 check_install()（含非本脚本安装的拦截）；卸载模式下其预下载已被 IS_UNINSTALL 守卫跳过
       check_install; uninstall; exit 0
       ;;
     -N )
