@@ -42,6 +42,17 @@ check_latest_sing-box() {
   fi
 }
 
+# 配置文件"存在即跳过"写入：检测到目标文件已存在(例如只读挂载的用户配置)时不覆盖，
+# 既避免 cat 重定向在只读文件系统上失败导致 set -e 退出，也保护用户手改的分片配置不被重新生成逻辑覆盖。
+write_conf() {
+  local path="$1"
+  if [ -e "$path" ]; then
+    info "配置文件已存在，跳过覆盖: $path"
+    return 0
+  fi
+  cat > "$path"
+}
+
 # 安装 sing-box 容器
 install() {
   # 下载 sing-box
@@ -160,7 +171,7 @@ install() {
   fi
 
   # 生成 log 配置
-  cat > ${WORK_DIR}/conf/00_log.json << EOF
+  write_conf ${WORK_DIR}/conf/00_log.json << EOF
 {
     "log":{
         "disabled":false,
@@ -172,7 +183,7 @@ install() {
 EOF
 
   # 生成 outbound 配置
-  cat > ${WORK_DIR}/conf/01_outbounds.json << EOF
+  write_conf ${WORK_DIR}/conf/01_outbounds.json << EOF
 {
     "outbounds":[
         {
@@ -184,7 +195,7 @@ EOF
 EOF
 
   # 生成 endpoint 配置
-  cat > ${WORK_DIR}/conf/02_endpoints.json << EOF
+  write_conf ${WORK_DIR}/conf/02_endpoints.json << EOF
 {
     "endpoints":[
         {
@@ -218,7 +229,7 @@ EOF
 EOF
 
   # 生成 route 配置
-  cat > ${WORK_DIR}/conf/03_route.json << EOF
+  write_conf ${WORK_DIR}/conf/03_route.json << EOF
 {
     "route":{
         "default_http_client": "http-client-direct",
@@ -263,7 +274,7 @@ EOF
 EOF
 
   # 生成缓存文件
-  cat > ${WORK_DIR}/conf/04_experimental.json << EOF
+  write_conf ${WORK_DIR}/conf/04_experimental.json << EOF
 {
     "experimental": {
         "cache_file": {
@@ -275,7 +286,7 @@ EOF
 EOF
 
   # 生成 dns 配置文件
-  cat > ${WORK_DIR}/conf/05_dns.json << EOF
+  write_conf ${WORK_DIR}/conf/05_dns.json << EOF
 {
     "dns":{
         "servers":[
@@ -289,7 +300,7 @@ EOF
 EOF
 
   # 内建的 NTP 客户端服务配置文件，这对于无法进行时间同步的环境很有用
-  cat > ${WORK_DIR}/conf/06_ntp.json << EOF
+  write_conf ${WORK_DIR}/conf/06_ntp.json << EOF
 {
     "ntp": {
         "enabled": true,
@@ -301,7 +312,7 @@ EOF
 EOF
 
   # 专门给 sing-box 内部组件发 HTTP 请求用，比如这些场景会用到它：下载远程 rule_set：.srs 规则文件，ACME 申请证书，Cloudflare Origin CA 证书提供器，DERP / Tailscale 相关 HTTP 请求
-  cat > ${WORK_DIR}/conf/07_http_clients.json << EOF
+  write_conf ${WORK_DIR}/conf/07_http_clients.json << EOF
 {
     "http_clients": [
         {
@@ -312,7 +323,7 @@ EOF
 EOF
 
   # 生成 XTLS + Reality 配置
-  [ "${XTLS_REALITY}" = 'true' ] && ((PORT++)) && PORT_XTLS_REALITY=$PORT && cat > ${WORK_DIR}/conf/11_xtls-reality_inbounds.json << EOF
+  [ "${XTLS_REALITY}" = 'true' ] && ((PORT++)) && PORT_XTLS_REALITY=$PORT && write_conf ${WORK_DIR}/conf/11_xtls-reality_inbounds.json << EOF
 //  "public_key":"${REALITY_PUBLIC}"
 {
     "inbounds":[
@@ -357,7 +368,7 @@ EOF
 EOF
 
   # 生成 Hysteria2 配置
-  [ "${HYSTERIA2}" = 'true' ] && ((PORT++)) && PORT_HYSTERIA2=$PORT && cat > ${WORK_DIR}/conf/12_hysteria2_inbounds.json << EOF
+  [ "${HYSTERIA2}" = 'true' ] && ((PORT++)) && PORT_HYSTERIA2=$PORT && write_conf ${WORK_DIR}/conf/12_hysteria2_inbounds.json << EOF
 {
     "inbounds":[
         {
@@ -387,7 +398,7 @@ EOF
 EOF
 
   # 生成 Tuic V5 配置
-  [ "${TUIC}" = 'true' ] && ((PORT++)) && PORT_TUIC=$PORT && cat > ${WORK_DIR}/conf/13_tuic_inbounds.json << EOF
+  [ "${TUIC}" = 'true' ] && ((PORT++)) && PORT_TUIC=$PORT && write_conf ${WORK_DIR}/conf/13_tuic_inbounds.json << EOF
 {
     "inbounds":[
         {
@@ -417,7 +428,7 @@ EOF
 EOF
 
   # 生成 ShadowTLS V5 配置
-  [ "${SHADOWTLS}" = 'true' ] && ((PORT++)) && PORT_SHADOWTLS=$PORT && cat > ${WORK_DIR}/conf/14_ShadowTLS_inbounds.json << EOF
+  [ "${SHADOWTLS}" = 'true' ] && ((PORT++)) && PORT_SHADOWTLS=$PORT && write_conf ${WORK_DIR}/conf/14_ShadowTLS_inbounds.json << EOF
 {
     "inbounds":[
         {
@@ -460,7 +471,7 @@ EOF
 EOF
 
   # 生成 Shadowsocks 配置
-  [ "${SHADOWSOCKS}" = 'true' ] && ((PORT++)) && PORT_SHADOWSOCKS=$PORT && cat > ${WORK_DIR}/conf/15_shadowsocks_inbounds.json << EOF
+  [ "${SHADOWSOCKS}" = 'true' ] && ((PORT++)) && PORT_SHADOWSOCKS=$PORT && write_conf ${WORK_DIR}/conf/15_shadowsocks_inbounds.json << EOF
 {
     "inbounds":[
         {
@@ -485,7 +496,7 @@ EOF
 EOF
 
   # 生成 Trojan 配置
-  [ "${TROJAN}" = 'true' ] && ((PORT++)) && PORT_TROJAN=$PORT && cat > ${WORK_DIR}/conf/16_trojan_inbounds.json << EOF
+  [ "${TROJAN}" = 'true' ] && ((PORT++)) && PORT_TROJAN=$PORT && write_conf ${WORK_DIR}/conf/16_trojan_inbounds.json << EOF
 {
     "inbounds":[
         {
@@ -518,7 +529,7 @@ EOF
 EOF
 
   # 生成 vmess + ws 配置
-  [ "${VMESS_WS}" = 'true' ] && ((PORT++)) && PORT_VMESS_WS=$PORT && cat > ${WORK_DIR}/conf/17_vmess-ws_inbounds.json << EOF
+  [ "${VMESS_WS}" = 'true' ] && ((PORT++)) && PORT_VMESS_WS=$PORT && write_conf ${WORK_DIR}/conf/17_vmess-ws_inbounds.json << EOF
 //  "CDN": "${CDN}"
 {
     "inbounds":[
@@ -556,7 +567,7 @@ EOF
 EOF
 
   # 生成 vless + ws + tls 配置
-  [ "${VLESS_WS}" = 'true' ] && ((PORT++)) && PORT_VLESS_WS=$PORT && cat > ${WORK_DIR}/conf/18_vless-ws-tls_inbounds.json << EOF
+  [ "${VLESS_WS}" = 'true' ] && ((PORT++)) && PORT_VLESS_WS=$PORT && write_conf ${WORK_DIR}/conf/18_vless-ws-tls_inbounds.json << EOF
 //  "CDN": "${CDN}"
 {
     "inbounds":[
@@ -594,7 +605,7 @@ EOF
 EOF
 
   # 生成 H2 + Reality 配置
-  [ "${H2_REALITY}" = 'true' ] && ((PORT++)) && PORT_H2_REALITY=$PORT && cat > ${WORK_DIR}/conf/19_h2-reality_inbounds.json << EOF
+  [ "${H2_REALITY}" = 'true' ] && ((PORT++)) && PORT_H2_REALITY=$PORT && write_conf ${WORK_DIR}/conf/19_h2-reality_inbounds.json << EOF
 //  "public_key":"${REALITY_PUBLIC}"
 {
     "inbounds":[
@@ -641,7 +652,7 @@ EOF
 EOF
 
   # 生成 gRPC + Reality 配置
-  [ "${GRPC_REALITY}" = 'true' ] && ((PORT++)) && PORT_GRPC_REALITY=$PORT && cat > ${WORK_DIR}/conf/20_grpc-reality_inbounds.json << EOF
+  [ "${GRPC_REALITY}" = 'true' ] && ((PORT++)) && PORT_GRPC_REALITY=$PORT && write_conf ${WORK_DIR}/conf/20_grpc-reality_inbounds.json << EOF
 //  "public_key":"${REALITY_PUBLIC}"
 {
     "inbounds":[
@@ -689,7 +700,7 @@ EOF
 EOF
 
   # 生成 AnyTLS 配置
-  [ "${ANYTLS}" = 'true' ] && ((PORT++)) && PORT_ANYTLS=$PORT && cat > ${WORK_DIR}/conf/21_anytls_inbounds.json << EOF
+  [ "${ANYTLS}" = 'true' ] && ((PORT++)) && PORT_ANYTLS=$PORT && write_conf ${WORK_DIR}/conf/21_anytls_inbounds.json << EOF
 {
     "inbounds":[
         {
