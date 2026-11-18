@@ -33,6 +33,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 2026.10.13 v1.3.26 1. insert iptables / ip6tables allow rules before the first REJECT/DROP in INPUT instead of appending to the chain tail, which left node and nginx ports unreachable on images such as Oracle OCI and OpenVZ. https://github.com/fscarmen/sing-box/issues/353; 2. read the latest sing-box version from releases.atom (~11 KB) instead of the GitHub releases API (~10 MB), with the API and DEFAULT_NEWEST_VERSION as fallbacks, so an empty version no longer aborts install or upgrade. https://github.com/fscarmen/sing-box/issues/355; 1. iptables / ip6tables 放行规则改为插入 INPUT链第一条 REJECT/DROP 之前，不再追加到链尾，修复甲骨文 OCI、OpenVZ 等镜像上节点端口与 nginx 端口无法访问的问题。https://github.com/fscarmen/sing-box/issues/353; 2. 最新版本号改从 releases.atom 获取（约 11 KB），替代返回约 10 MB 的 github api，api 与 DEFAULT_NEWEST_VERSION 作为兜底，取不到版本号导致安装或升级中断的问题不再发生。 https://github.com/fscarmen/sing-box/issues/355
 =======
 2026.10.13 v1.3.26 1. insert iptables / ip6tables allow rules before the first REJECT/DROP in INPUT instead of appending to the chain tail, which left node and nginx ports unreachable on images such as Oracle OCI and OpenVZ https://github.com/fscarmen/sing-box/issues/353; 2. read the latest sing-box version from releases.atom (~11 KB) instead of the GitHub releases API (~10 MB), with the API and DEFAULT_NEWEST_VERSION as fallbacks, so an empty version no longer aborts install or upgrade https://github.com/fscarmen/sing-box/issues/355; 3. Enable readline line editing for interactive prompts: arrow keys, Home / End, Ctrl+A, Ctrl+E, Ctrl+K, Ctrl+U, Ctrl+W, Ctrl+Y and Ctrl+L now work during install and [sb -d]; non-interactive input (pipe / script) keeps the original read semantics https://github.com/fscarmen/sing-box/pull/357#issuecomment-6137941771; 4. Make the uninstall path fully offline: sb -u no longer runs CDN detection and no longer pre-downloads subscription templates, binaries or cloudflared, so it completes immediately on hosts that cannot reach GitHub https://github.com/fscarmen/sing-box/issues/358; 1. iptables / ip6tables 放行规则改为插入 INPUT链第一条 REJECT/DROP 之前，不再追加到链尾，修复甲骨文 OCI、OpenVZ 等镜像上节点端口与 nginx 端口无法访问的问题 https://github.com/fscarmen/sing-box/issues/353; 2. 最新版本号改从 releases.atom 获取（约 11 KB），替代返回约 10 MB 的 github api，api 与 DEFAULT_NEWEST_VERSION 作为兜底，取不到版本号导致安装或升级中断的问题不再发生 https://github.com/fscarmen/sing-box/issues/355; 3.交互输入启用 readline 行编辑：安装与 [sb -d] 提示中支持方向键、Home / End、Ctrl+A、Ctrl+E、Ctrl+K、Ctrl+U、Ctrl+W、Ctrl+Y、Ctrl+L；管道 / 脚本等非交互输入保持原 read 语义 https://github.com/fscarmen/sing-box/pull/357#issuecomment-6137941771；4. 卸载流程完全离线化：sb -u 不再执行 CDN 探测，也不再预下载订阅模板、二进制与 cloudflared，GitHub 不可达时也能立即完成卸载 https://github.com/fscarmen/sing-box/issues/358
@@ -49,11 +50,16 @@
 2026.11.17 v1.3.31 Add dynamic subscription (render subscription by request Host): a post-install feature, available via `sb -d` only after a fresh install with subscription enabled. Direct node servers follow the access address (IPv4/IPv6/Domain/Tunnel), supporting multi-IP servers and IPv6 address pools; 新增动态订阅（按请求 Host 实时渲染）：安装后功能，需先完成新安装并开启订阅，再通过 `sb -d` 添加；直连节点 server 跟随访问地址（IPv4/IPv6/域名/固定隧道），适配多 IP 机器与 IPv6 地址池
 
 >>>>>>> upstream/main
+=======
+2026.11.17 v1.3.31 Add dynamic subscription (render subscription by request Host): a post-install feature, available via `sb -d` only after a fresh install with subscription enabled. Direct node servers follow the access address (IPv4/IPv6/Domain/Tunnel), supporting multi-IP servers and IPv6 address pools; 新增动态订阅（按请求 Host 实时渲染）：安装后功能，需先完成新安装并开启订阅，再通过 `sb -d` 添加；直连节点 server 跟随访问地址（IPv4/IPv6/域名/固定隧道），适配多 IP 机器与 IPv6 地址池
+
+>>>>>>> upstream/main
 2026.11.07 v1.3.30 Add Snell v6 inbound with V2rayN, Throne, Clash Verge, Shadowrocket and sing-box client configuration output; 新增 Snell v6 入站，并输出 V2rayN、Throne、Clash Verge、Shadowrocket 和 sing-box 客户端配置
 
 >>>>>>> upstream/main
 2026.10.31 v1.3.29 Hysteria2 流量不再通过 WARP 出站，存量 Hysteria2 专属 WARP 路由自动清理；Hysteria2 Realm 功能保持不变
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> upstream/main
 2026.10.22 v1.3.28 sync cloudflared (Argo) in [sb -v], independent from sing-box https://github.com/fscarmen/sing-box/issues/364; [sb -v] 支持同步升级 cloudflared (Argo)，与 Sing-box 相互独立 https://github.com/fscarmen/sing-box/issues/364
@@ -69,6 +75,8 @@
 
 2026.09.16 v1.3.25 Add Hysteria2 ignore_client_bandwidth toggle in [sb -d], default off; [sb -d] 新增 Hysteria2 ignore_client_bandwidth 开关，新安装默认关闭
 
+=======
+>>>>>>> upstream/main
 =======
 >>>>>>> upstream/main
 =======

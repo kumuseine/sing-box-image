@@ -59,6 +59,7 @@ C[0]="${E[0]}"
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 E[1]="Fix the firewall allow rules being appended after an existing REJECT/DROP rule on the INPUT chain, which left node and nginx ports unreachable on images such as Oracle OCI and OpenVZ; the rules are now inserted before the first REJECT/DROP rule. ufw / firewalld hosts are not affected, as those place allow rules ahead of any terminal rule by design. 2. Fix occasional empty version detection when checking for sing-box updates, which could abort installation or upgrade; the version is now read from the lightweight releases.atom feed first, with the GitHub API as fallback"
 C[1]="修复入站放行规则被追加到 INPUT 链已有的 REJECT/DROP 规则之后，导致甲骨文 OCI、OpenVZ 等镜像上节点端口与 nginx 端口无法访问的问题；放行规则现改为插入到第一条 REJECT/DROP 规则之前。ufw / firewalld 机器不受影响，这类防火墙本身就把放行规则放在终结规则之前。2. 修复检测 sing-box 更新时偶尔取不到最新版本号、导致安装或升级中断的问题；改为优先从体积很小的 releases.atom 获取，github api 作为兜底"
 =======
@@ -88,6 +89,10 @@ C[1]="1. [sb -d] 添加 XTLS reality 的 xtls-rprx-vision 与多路复用相互�
 =======
 E[1]="1. Add Snell v6 inbound with Throne, Clash Verge, Shadowrocket and sing-box client output; 2. [sb -d]: switch XTLS reality between xtls-rprx-vision and multiplex; 3. [sb -v]: sync cloudflared (Argo) to the latest version, independently from Sing-box (checked first, then Sing-box); 4. Hysteria2 traffic no longer routes through the WARP endpoint. Existing Hysteria2-specific WARP routes are removed automatically, while Hysteria2 Realm remains available"
 C[1]="1. 新增 Snell v6 入站，并输出 Throne、Clash Verge、Shadowrocket 和 sing-box 客户端配置; 2. [sb -d] 添加 XTLS reality 的 xtls-rprx-vision 与多路复用相互切换; 3. [sb -v] 支持同步升级 cloudflared (Argo)，与 Sing-box 相互独立（先检查 cloudflared，再检查 Sing-box）; 4. Hysteria2 流量不再通过 WARP 出站，存量 Hysteria2 专属 WARP 路由自动清理；Hysteria2 Realm 功能保持不变"
+>>>>>>> upstream/main
+=======
+E[1]="Dynamic Subscription (post-install feature: available via sb -d only after a fresh install with subscription enabled): nginx renders the subscription in real time by request Host, direct node servers follow the access address (IPv4/IPv6/Domain/Tunnel), ideal for multi-IP servers and IPv6 address pools; WS/CDN/Argo nodes stay unchanged. Enable it with sb -d → Enable Subscription → Enable Dynamic Subscription."
+C[1]="动态订阅（安装后功能：需先完成新安装并开启订阅，再通过 sb -d 添加）：nginx 按请求 Host 实时渲染，直连节点 server 跟随访问地址（IPv4/IPv6/域名/固定隧道），一份订阅适配多 IP 机器与 IPv6 地址池，WS/CDN/Argo 节点保持原地址不变。开启路径：sb -d → 开启订阅 → 开启动态订阅。"
 >>>>>>> upstream/main
 =======
 E[1]="Dynamic Subscription (post-install feature: available via sb -d only after a fresh install with subscription enabled): nginx renders the subscription in real time by request Host, direct node servers follow the access address (IPv4/IPv6/Domain/Tunnel), ideal for multi-IP servers and IPv6 address pools; WS/CDN/Argo nodes stay unchanged. Enable it with sb -d → Enable Subscription → Enable Dynamic Subscription."
@@ -487,6 +492,7 @@ E[197]="Disable dynamic subscription"
 C[197]="关闭动态订阅"
 E[198]="Dynamic subscription requires subscription enabled first"
 C[198]="动态订阅需要先开启订阅"
+<<<<<<< HEAD
 E[199]="Dynamic subscription addresses (node server follows request Host):"
 C[199]="动态订阅地址（节点 server 跟随访问地址）:"
 E[200]="Enable dynamic subscription succeeded"
@@ -501,6 +507,20 @@ E[204]="Domain"
 C[204]="域名"
 E[205]="Tunnel"
 C[205]="隧道"
+=======
+E[199]="Enable dynamic subscription succeeded"
+C[199]="开启动态订阅成功"
+E[200]="Disable dynamic subscription succeeded"
+C[200]="关闭动态订阅成功"
+E[201]="Failed to install dynamic subscription dependencies"
+C[201]="动态订阅依赖安装失败"
+E[202]="Dynamic subscription renderer failed"
+C[202]="动态订阅渲染失败"
+E[203]="Domain"
+C[203]="域名"
+E[204]="Tunnel"
+C[204]="隧道"
+>>>>>>> upstream/main
 
 # 自定义字体彩色，read 函数
 warning() { echo -e "\033[31m\033[01m$*\033[0m"; }  # 红色
@@ -1248,14 +1268,20 @@ change_config() {
     # 动态订阅开关 — 状态由 nginx.conf 中的 FastCGI location 决定
     # 前置校验：动态订阅依赖普通订阅，必须先开启普通订阅才能开启动态订阅。
     # 注意：关闭动态订阅时不受此限制（已开启动态必然满足此条件），因此校验放在最前不影响关闭。
+<<<<<<< HEAD
     if ! grep -qE 'location ~ \^/[^/]+/auto \{' "${WORK_DIR}/nginx.conf" 2>/dev/null; then
       warning " $(text 198) " && return
     fi
     # 从旧 nginx.conf 读取 PORT_NGINX / UUID_CONFIRM
+=======
+    ! grep -qE 'location ~ \^/[^/]+/auto \{' "${WORK_DIR}/nginx.conf" 2>/dev/null && warning " $(text 198) " && return
+    # 读取现有 nginx.conf 的反代端口
+>>>>>>> upstream/main
     PORT_NGINX=$(awk '/listen/{print $2; exit}' ${WORK_DIR}/nginx.conf)
     [ -s ${ARGO_DAEMON_FILE} ] && IS_ARGO=is_argo || IS_ARGO=no_argo
 
     if dynamic_sub_enabled; then
+<<<<<<< HEAD
       # 已开启 → 仅关闭动态订阅，普通订阅保持开启。
       # 关键点：IS_SUB 是全局量，export_list / sing-box_systemd 内部的 check_install
       # 会用 subscribe/qr 反推它；此处显式固定 is_sub，并在每个可能反推的调用后重新固定，
@@ -1265,6 +1291,11 @@ change_config() {
       # UUID_CONFIRM 拼静态 auto location 路径。change_config 入口只调了 check_install，
       # 不含 UUID_CONFIRM；若不取，会生成 location ~ ^//auto，静态订阅 URL 丢失 UUID 前缀，
       # 菜单按正则判定为“订阅已关闭”，表现为“关动态把普通订阅也关了”。
+=======
+      # 已开启 → 仅关闭动态订阅，普通订阅保持开启；显式保留普通订阅避免被状态探测覆盖。
+      info "\n $(text 197) "
+      # 必须先取 UUID_CONFIRM：否则会生成 location ~ ^//auto，静态订阅 URL 丢失 UUID 前缀。
+>>>>>>> upstream/main
       fetch_nodes_value
       IS_DYNAMIC_SUB=no_dynamic_sub
       IS_SUB=is_sub
@@ -1273,10 +1304,15 @@ change_config() {
       fcgiwrap_stop
       rm -rf "$DYNAMIC_SUBSCRIBE_DIR"
       sing-box_systemd
+<<<<<<< HEAD
       IS_SUB=is_sub
       export_list
       IS_SUB=is_sub
       info " $(text 201) "
+=======
+      export_list
+      info " $(text 200) "
+>>>>>>> upstream/main
       return
     fi
 
@@ -1286,6 +1322,7 @@ change_config() {
     IS_SUB=is_sub
     IS_DYNAMIC_SUB=is_dynamic_sub
     fetch_nodes_value
+<<<<<<< HEAD
     generate_render_script || { warning " $(text 203) "; return 1; }
     # 生成只读模板（占位符版），复用完整渲染逻辑但不触碰静态文件。
     # 必须用子 shell：模板模式会把 SERVER_IP/SUB_OUT_DIR/SUB_TPL_SRC 改写成
@@ -1298,11 +1335,23 @@ change_config() {
     # 必须在写配置前重新固定为「开启」意图，否则会生成无订阅块的 nginx.conf。
     IS_SUB=is_sub
     IS_DYNAMIC_SUB=is_dynamic_sub
+=======
+    generate_render_script || { warning " $(text 202) "; return 1; }
+    # 生成只读模板（占位符版），不触碰静态订阅文件。
+    # 必须用子 shell：模板模式会改写 SERVER_IP/SUB_OUT_DIR/SUB_TPL_SRC，否则污染当前 shell。
+    ( export_list dynamic_template ) >/dev/null 2>&1 || { warning " $(text 202) "; return 1; }
+    dynamic_meta_write
+    fcgiwrap_run || { warning " $(text 202) "; return 1; }
+>>>>>>> upstream/main
     export_nginx_conf_file
     # 生成后校验：确认订阅块与 FastCGI 块都已写入，否则中止并回滚，避免假成功
     if ! grep -qE 'location ~ \^/[^/]+/auto \{' "${WORK_DIR}/nginx.conf" 2>/dev/null || \
        ! grep -qE 'fastcgi_pass.*fcgiwrap\.sock' "${WORK_DIR}/nginx.conf" 2>/dev/null; then
+<<<<<<< HEAD
       warning " $(text 203) "
+=======
+      warning " $(text 202) "
+>>>>>>> upstream/main
       IS_DYNAMIC_SUB=no_dynamic_sub
       export_nginx_conf_file
       fcgiwrap_stop
@@ -1313,7 +1362,11 @@ change_config() {
     sing-box_systemd
     nginx_sync
     export_list
+<<<<<<< HEAD
     info " $(text 200) "
+=======
+    info " $(text 199) "
+>>>>>>> upstream/main
     return
   fi
 
@@ -2373,6 +2426,7 @@ check_brutal() {
 check_install() {
   local PS_LIST=$(ps -eo pid,args | grep -E "$WORK_DIR.*([s]ing-box|[c]loudflared|[n]ginx)" | sed 's/^[ ]\+//g')
 
+<<<<<<< HEAD
   [[ "$IS_SUB" = 'is_sub' || -s ${WORK_DIR}/subscribe/qr ]] && IS_SUB=is_sub || IS_SUB=no_sub
   # 动态订阅状态以 nginx.conf 中的 FastCGI location 为唯一事实来源。
   # 仅在未显式设置时补检测：change_config 的开关 handler 会先显式赋值，且此时
@@ -2383,6 +2437,15 @@ check_install() {
     else
       IS_DYNAMIC_SUB=no_dynamic_sub
     fi
+=======
+  # 订阅/动态订阅状态仅在未显式设置时探测，nginx.conf 是唯一事实来源。
+  if [ -z "$IS_SUB" ]; then
+    [ -s "${WORK_DIR}/nginx.conf" ] && grep -qE 'location ~ \^/[^/]+/auto \{' "${WORK_DIR}/nginx.conf" 2>/dev/null && IS_SUB=is_sub || IS_SUB=no_sub
+  fi
+  # 动态订阅依赖普通订阅；nginx.conf 可能尚未刷新，不能覆盖显式意图。
+  if [ -z "$IS_DYNAMIC_SUB" ]; then
+    [ "$IS_SUB" = 'is_sub' ] && [ -s "${WORK_DIR}/nginx.conf" ] && grep -qE 'fastcgi_pass.*fcgiwrap\.sock' "${WORK_DIR}/nginx.conf" 2>/dev/null && IS_DYNAMIC_SUB=is_dynamic_sub || IS_DYNAMIC_SUB=no_dynamic_sub
+>>>>>>> upstream/main
   fi
   if ls ${WORK_DIR}/conf/*${NODE_TAG[1]}_inbounds.json >/dev/null 2>&1; then
     check_port_hopping_nat
@@ -2889,6 +2952,14 @@ check_port_hopping_nat() {
 
 # 检测 IPv4 IPv6 信息
 check_system_ip() {
+  # 会话内缓存：命中则直接读缓存赋值，跳过网络探测
+  local CACHE_FILE="$TEMP_DIR/sb_system_ip_cache"
+  if [ -s "$CACHE_FILE" ]; then
+    WAN4='' WAN6='' COUNTRY4='' COUNTRY6='' EMOJI4='' EMOJI6='' ASNORG4='' ASNORG6=''
+    source "$CACHE_FILE" 2>/dev/null
+    return 0
+  fi
+
   [ "$L" = 'C' ] && local IS_CHINESE='?lang=zh-CN'
   local DEFAULT_LOCAL_INTERFACE4=$(ip -4 route show default | awk '/default/ {for (i=0; i<NF; i++) if ($i=="dev") {print $(i+1); exit}}')
   # 无对应协议族默认路由时跳过探测，避免 wget 空等满超时；两族并行，族内主备串行
@@ -2940,6 +3011,18 @@ check_system_ip() {
   EMOJI6=$(awk -F '"' '/"emoji"/{print $4}' <<< "$IP6_JSON") &&
   ASNORG6=$(awk -F '"' '/"isp"/{print $4}' <<< "$IP6_JSON") &&
   rm -f $TEMP_DIR/ip6.json
+
+  # 写入会话缓存，供 dynamic_meta_write 等后续调用复用
+  cat > "$CACHE_FILE" <<EOF
+WAN4='${WAN4:-}'
+WAN6='${WAN6:-}'
+COUNTRY4='${COUNTRY4:-}'
+COUNTRY6='${COUNTRY6:-}'
+EMOJI4='${EMOJI4:-}'
+EMOJI6='${EMOJI6:-}'
+ASNORG4='${ASNORG4:-}'
+ASNORG6='${ASNORG6:-}'
+EOF
 }
 
 # 输入起始 port 函数
@@ -3046,7 +3129,7 @@ apply_ports_post() {
   # nginx 反代端口同步：nginx.conf 存在则重建并热加载（proxy_pass 必须跟随 WS 端口变化，
   # 不依赖 PORT_NGINX 是否已被 IS_SUB/IS_ARGO 分支读入）
   if [ -s "${WORK_DIR}/nginx.conf" ]; then
-    [ -z "$PORT_NGINX" ] && PORT_NGINX=$(awk '/listen/{print $2; exit}' ${WORK_DIR}/nginx.conf | tr -d ';')
+    [ -z "$PORT_NGINX" ] && PORT_NGINX=$(awk '/listen/{print $2; exit}' ${WORK_DIR}/nginx.conf)
     # 现有 nginx.conf 已含本地 WS 反代时强制按 is_argo 重建，
     # 避免 IS_ARGO 标志缺失/失效时导出配置丢失 WS 反代（端口变化后必须跟随）
     local _ARGO_BAK="${IS_ARGO-}"
@@ -4054,7 +4137,7 @@ sync_firewall_rules() {
 }
 export_argo_json_file() {
   local FILE_PATH=$1
-  [[ -z "$PORT_NGINX" && -s ${WORK_DIR}/nginx.conf ]] && local PORT_NGINX=$(awk '/listen/{print $2; exit}' ${WORK_DIR}/nginx.conf)
+  [[ -z "$PORT_NGINX" && -s ${WORK_DIR}/nginx.conf ]] && PORT_NGINX=$(awk '/listen/{print $2; exit}' ${WORK_DIR}/nginx.conf)
   [ ! -s $FILE_PATH/tunnel.json ] && echo $ARGO_JSON > $FILE_PATH/tunnel.json
   [ ! -s $FILE_PATH/tunnel.yml ] && cat > $FILE_PATH/tunnel.yml << EOF
 tunnel: $(awk -F '"' '{print $12}' <<< "$ARGO_JSON")
@@ -4189,7 +4272,11 @@ render_subscribe_deps() {
     CentOS) ${PACKAGE_INSTALL[int]} epel-release >/dev/null 2>&1; ${PACKAGE_INSTALL[int]} fcgiwrap spawn-fcgi >/dev/null 2>&1 ;;
     *) ${PACKAGE_INSTALL[int]} fcgiwrap spawn-fcgi >/dev/null 2>&1 ;;
   esac
+<<<<<<< HEAD
   command -v fcgiwrap >/dev/null 2>&1 && command -v spawn-fcgi >/dev/null 2>&1 || { warning " $(text 202) "; return 1; }
+=======
+  command -v fcgiwrap >/dev/null 2>&1 && command -v spawn-fcgi >/dev/null 2>&1 || { warning " $(text 201) "; return 1; }
+>>>>>>> upstream/main
   return 0
 }
 
@@ -4228,8 +4315,11 @@ fcgiwrap_stop() {
   [ -s "$DYNAMIC_PID_FILE" ] && kill "$(cat "$DYNAMIC_PID_FILE")" 2>/dev/null
   rm -f "$DYNAMIC_SOCKET" "$DYNAMIC_PID_FILE"
   rm -f "$DYNAMIC_RENDER_SCRIPT" "${DYNAMIC_RENDER_SCRIPT}.tmp"
+<<<<<<< HEAD
   # 清理旧版内联 CGI 方案留下的 sing-box.sh 副本。
   rm -f "${WORK_DIR}/sing-box.sh"
+=======
+>>>>>>> upstream/main
 }
 
 # 生成独立 render.sh：请求时渲染逻辑与 sing-box.sh 完全分离。
@@ -4385,8 +4475,11 @@ RENDER_SCRIPT_EOF
     return 1
   fi
   chmod 700 "$DYNAMIC_RENDER_SCRIPT"
+<<<<<<< HEAD
   # 清理旧版内联 CGI 方案留下的 sing-box.sh 副本。
   rm -f "${WORK_DIR}/sing-box.sh"
+=======
+>>>>>>> upstream/main
 }
 
 # F6：输出指定模板的多套动态订阅地址（按实际存在的访问地址裁剪）
@@ -4406,12 +4499,20 @@ dynamic_subscribe_output() {
   fi
   # SERVER_IP 是域名（非 IPv4、非 IPv6）时才输出域名行
   if [ -n "$SERVER_IP" ] && [[ "$SERVER_IP" != *:* ]] && [[ ! "$SERVER_IP" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
+<<<<<<< HEAD
     LABEL="$(text 204)"
+=======
+    LABEL="$(text 203)"
+>>>>>>> upstream/main
     case "$LABEL" in 域名|隧道) LABEL="${LABEL}  " ;; *) printf -v LABEL '%-6s' "$LABEL" ;; esac
     printf -v LINE '%s: %s\n' "$LABEL" "http://${SERVER_IP}:${PORT_NGINX}/${UUID_CONFIRM}/${SUFFIX}"; DYN_LINES+="$LINE"
   fi
   if [ -n "$ARGO_DOMAIN" ]; then
+<<<<<<< HEAD
     LABEL="$(text 205)"
+=======
+    LABEL="$(text 204)"
+>>>>>>> upstream/main
     case "$LABEL" in 域名|隧道) LABEL="${LABEL}  " ;; *) printf -v LABEL '%-6s' "$LABEL" ;; esac
     printf -v LINE '%s: %s\n' "$LABEL" "https://${ARGO_DOMAIN}/${UUID_CONFIRM}/${SUFFIX}"; DYN_LINES+="$LINE"
   fi
@@ -5890,9 +5991,23 @@ export_list() {
     SUB_OUT_DIR="$DYNAMIC_TEMPLATE_DIR"
     SUB_TPL_SRC="$DYNAMIC_TEMPLATE_DIR/src"
     mkdir -p "$SUB_OUT_DIR" "$SUB_TPL_SRC"
+<<<<<<< HEAD
     # 模板源独立下载/复用，不依赖 TEMP_DIR，保证静态路径零副作用
     for TPL_NAME in clash clash2 sing-box-template; do
       [ -s "${SUB_TPL_SRC}/${TPL_NAME}" ] || wget --no-check-certificate --continue --tries=2 --timeout=10 -qO "${SUB_TPL_SRC}/${TPL_NAME}" "${GH_PROXY}${SUBSCRIBE_TEMPLATE}/$( [ "$TPL_NAME" = 'sing-box-template' ] && echo sing-box || echo $TPL_NAME )" 2>/dev/null
+=======
+    # 模板源优先复用 check_install() 已下载到 TEMP_DIR 的文件，避免重复网络下载。
+    # check_install() 的下载是后台并行的（2402-2404），此处先 wait 确保完成。
+    # 回退：TEMP_DIR 无文件时（极少见）才走网络下载。
+    wait 2>/dev/null
+    for TPL_NAME in clash clash2 sing-box-template; do
+      [ -s "${SUB_TPL_SRC}/${TPL_NAME}" ] && continue
+      if [ -s "${TEMP_DIR}/${TPL_NAME}" ]; then
+        cp "${TEMP_DIR}/${TPL_NAME}" "${SUB_TPL_SRC}/${TPL_NAME}"
+      else
+        wget --no-check-certificate --continue --tries=2 --timeout=10 -qO "${SUB_TPL_SRC}/${TPL_NAME}" "${GH_PROXY}${SUBSCRIBE_TEMPLATE}/$( [ "$TPL_NAME" = 'sing-box-template' ] && echo sing-box || echo $TPL_NAME )" 2>/dev/null
+      fi
+>>>>>>> upstream/main
     done
   else
     SUB_OUT_DIR="${WORK_DIR}/subscribe"
