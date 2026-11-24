@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 
 # 当前脚本版本号
+<<<<<<< HEAD
 VERSION='v1.3.31 (2026.11.17)'
+=======
+VERSION='v1.3.31 (2026.11.23)'
+>>>>>>> upstream/main
 
 # Github 反代加速代理
 GITHUB_PROXY=('https://ghproxy.lvedong.eu.org/' 'https://accel.cloudflare.nyc.mn/')
@@ -27,6 +31,18 @@ IP_API_NODES=('https://ip.cloudflare.now.cc' 'https://ip.cloudflare.nyc.mn')
 FINGER_PRINT='chrome'
 STEP_NUM=0      # 当前步骤编号（安装流程中动态递增）
 TOTAL_STEPS=''  # 总步骤数（协议确定后动态计算）
+<<<<<<< HEAD
+=======
+IS_SUB=''  # 普通订阅状态；留空时由 nginx.conf 自动探测
+IS_ARGO=''  # Argo 状态；留空时由 argo.service 自动探测
+ARGO_EXPLICIT=false  # ARGO 是否由配置或命令行显式设置
+SUBSCRIBE_EXPLICIT=false  # SUBSCRIBE 是否显式设置；用于区分显式 false 与留空默认
+SUBSCRIBE_DYNAMIC_INTENT=false  # SUBSCRIBE=dynamic 的安装期意图
+IS_DYNAMIC_SUB=''  # 动态订阅状态；留空时由 nginx.conf 自动探测
+ARGO_INSTALLED=false  # Argo 守护进程文件是否存在
+ARGO_RUNNING=false  # Argo 服务当前是否运行
+
+>>>>>>> upstream/main
 DYNAMIC_SUBSCRIBE_DIR="${WORK_DIR}/subscribe/dynamic"
 DYNAMIC_TEMPLATE_DIR="${DYNAMIC_SUBSCRIBE_DIR}/templates"
 DYNAMIC_META_FILE="${DYNAMIC_SUBSCRIBE_DIR}/meta.env"
@@ -51,6 +67,7 @@ mkdir -p "$TEMP_DIR"
 
 E[0]="Language:\n 1. English (default) \n 2. 简体中文"
 C[0]="${E[0]}"
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -97,6 +114,10 @@ C[1]="动态订阅（安装后功能：需先完成新安装并开启订阅，�
 =======
 E[1]="Dynamic Subscription (post-install feature: available via sb -d only after a fresh install with subscription enabled): nginx renders the subscription in real time by request Host, direct node servers follow the access address (IPv4/IPv6/Domain/Tunnel), ideal for multi-IP servers and IPv6 address pools; WS/CDN/Argo nodes stay unchanged. Enable it with sb -d → Enable Subscription → Enable Dynamic Subscription."
 C[1]="动态订阅（安装后功能：需先完成新安装并开启订阅，再通过 sb -d 添加）：nginx 按请求 Host 实时渲染，直连节点 server 跟随访问地址（IPv4/IPv6/域名/固定隧道），一份订阅适配多 IP 机器与 IPv6 地址池，WS/CDN/Argo 节点保持原地址不变。开启路径：sb -d → 开启订阅 → 开启动态订阅。"
+>>>>>>> upstream/main
+=======
+E[1]="1. [sb -d] supports setting an independent (non-consecutive) port for each protocol, only available after installation via [sb -d] so the install flow stays unchanged; 2. Dynamic Subscription: nginx renders the subscription in real time by request Host, so direct node servers follow the access address (IPv4/IPv6/Domain/Tunnel); WS/CDN/Argo nodes stay unchanged. Enable it after install with sb -d, or set SUBSCRIBE=dynamic / --SUBSCRIBE dynamic during installation; 3. Add TLS and SNI to VMess client configurations for Clash, V2rayN, Throne, ShadowRocket and sing-box clients."
+C[1]="1. [sb -d] 支持为各协议设置独立（非连续）端口，仅在安装后通过 [sb -d] 修改，不影响常规安装流程; 2. 动态订阅：nginx 按请求 Host 实时渲染，直连节点 server 跟随访问地址（IPv4/IPv6/域名/固定隧道），WS/CDN/Argo 节点保持原地址不变。可在安装后通过 sb -d 开启，也可在安装时设置 SUBSCRIBE=dynamic 或 --SUBSCRIBE dynamic; 3. VMess 客户端配置增加 TLS 和 SNI，覆盖 Clash、V2rayN、Throne、ShadowRocket 与 sing-box 客户端。"
 >>>>>>> upstream/main
 E[2]="Downloading Sing-box. Please wait a seconds ..."
 C[2]="下载 Sing-box 中，请稍等 ..."
@@ -493,6 +514,7 @@ C[197]="关闭动态订阅"
 E[198]="Dynamic subscription requires subscription enabled first"
 C[198]="动态订阅需要先开启订阅"
 <<<<<<< HEAD
+<<<<<<< HEAD
 E[199]="Dynamic subscription addresses (node server follows request Host):"
 C[199]="动态订阅地址（节点 server 跟随访问地址）:"
 E[200]="Enable dynamic subscription succeeded"
@@ -508,6 +530,8 @@ C[204]="域名"
 E[205]="Tunnel"
 C[205]="隧道"
 =======
+=======
+>>>>>>> upstream/main
 E[199]="Enable dynamic subscription succeeded"
 C[199]="开启动态订阅成功"
 E[200]="Disable dynamic subscription succeeded"
@@ -520,6 +544,25 @@ E[203]="Domain"
 C[203]="域名"
 E[204]="Tunnel"
 C[204]="隧道"
+<<<<<<< HEAD
+>>>>>>> upstream/main
+=======
+E[205]="Dynamic subscription was not enabled ({reason}). You can enable it later via sb -d → Enable Dynamic Subscription."
+C[205]="动态订阅未开启（{reason}）。可稍后通过 sb -d → 开启动态订阅 手动开启。"
+E[206]="Dynamic subscription service startup failed"
+C[206]="动态订阅服务启动失败"
+E[207]="Dynamic subscription local probe failed"
+C[207]="动态订阅本地探测失败"
+E[211]="Missing required \${TYPE} domain in non-interactive installation."
+C[211]="非交互安装缺少必需的 \${TYPE} 域名"
+E[212]="To uninstall fcgiwrap / spawn-fcgi press [y], they are not uninstalled by default:"
+C[212]="如要卸载 fcgiwrap / spawn-fcgi 请按 [y]，默认不卸载:"
+E[213]="Sing-box failed to start"
+C[213]="Sing-box 开启失败"
+E[214]="Invalid subscription value: \${VALUE}. Use true, false, or dynamic."
+C[214]="无效的订阅值：\${VALUE}。请使用 true、false 或 dynamic。"
+E[215]="Failed to download subscription templates."
+C[215]="下载订阅模板失败。"
 >>>>>>> upstream/main
 
 # 自定义字体彩色，read 函数
@@ -693,11 +736,14 @@ select_language() {
   if [ -z "$L" ]; then
     if [ -s ${WORK_DIR}/language ]; then
       L=$(cat ${WORK_DIR}/language)
+    elif is_quiet_install; then
+      L=E
     else
       L=E && hint "\n $(text 0) \n" && reading " $(text 24) " LANGUAGE
       [ "$LANGUAGE" = 2 ] && L=C
     fi
   fi
+  return 0
 }
 
 # 字母与数字的 ASCII 码值转换
@@ -760,7 +806,7 @@ input_cdn() {
     case "$CUSTOM_CDN" in
       [1-${#CDN_DOMAIN[@]}] )
         CDN="${CDN_DOMAIN[$((CUSTOM_CDN-1))]}"
-        CDN_PORT[17]='80' && CDN_PORT[18]='443'
+        CDN_PORT[17]='443' && CDN_PORT[18]='443'
         break
         ;;
       ?????* )
@@ -772,13 +818,13 @@ input_cdn() {
         if grep -q '.' <<< $PARSED_PORT; then
           CDN_PORT[17]=$PARSED_PORT && CDN_PORT[18]=$PARSED_PORT
         else
-          CDN_PORT[17]='80' && CDN_PORT[18]='443'
+          CDN_PORT[17]='443' && CDN_PORT[18]='443'
         fi
         break
         ;;
       * )
         CDN="${CDN_DOMAIN[0]}"
-        CDN_PORT[17]='80' && CDN_PORT[18]='443'
+        CDN_PORT[17]='443' && CDN_PORT[18]='443'
         break
     esac
   done
@@ -787,8 +833,12 @@ input_cdn() {
 # 输入 UUID
 input_uuid() {
   # 输入 UUID ，错误超过 5 次将会退出
-  local UUID_DEFAULT=$(cat /proc/sys/kernel/random/uuid)
-  [[ "$IS_FAST_INSTALL" = 'is_fast_install' || "$NONINTERACTIVE_INSTALL" = 'noninteractive_install' ]] && UUID_CONFIRM=${UUID_CONFIRM:-"$UUID_DEFAULT"}
+  local UUID_DEFAULT=''
+  [ -z "$UUID_CONFIRM" ] && UUID_DEFAULT=$(cat /proc/sys/kernel/random/uuid)
+  if is_quiet_install; then
+    UUID_CONFIRM=${UUID_CONFIRM:-"$UUID_DEFAULT"}
+    [[ ! "$UUID_CONFIRM" =~ ^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$ ]] && error "\n $(text 4) \n"
+  fi
   if [ -z "$UUID_CONFIRM" ]; then
     (( STEP_NUM++ )) || true
     reading "\n ${TOTAL_STEPS:+(${STEP_NUM}/${TOTAL_STEPS}) }$(text 12) " UUID_CONFIRM
@@ -814,7 +864,9 @@ input_node_name() {
     else
       local NODE_NAME_DEFAULT="${EMOJI}Sing-Box"
     fi
-    [[ "$IS_FAST_INSTALL" = 'is_fast_install' || "$NONINTERACTIVE_INSTALL" = 'noninteractive_install' ]] && NODE_NAME_CONFIRM="${NODE_NAME_DEFAULT}"
+    if is_quiet_install; then
+      NODE_NAME_CONFIRM="${NODE_NAME_DEFAULT}"
+    fi
     if [ -z "$NODE_NAME_CONFIRM" ]; then
       (( STEP_NUM++ )) || true
       reading "\n ${TOTAL_STEPS:+(${STEP_NUM}/${TOTAL_STEPS}) }$(text 13) " NODE_NAME_INPUT
@@ -826,6 +878,8 @@ input_node_name() {
 # 更换优选域名 / reality SNI / 节点名 / UUID
 change_config() {
   [ ! -d "${WORK_DIR}" ] && error " $(text 107) "
+  # -D 入口只做一次完整状态检查，后续菜单和导出复用这份状态。
+  check_install
 
   local MENU_IDX=() MENU_KEY=() MENU_VAL=()
 
@@ -866,8 +920,12 @@ change_config() {
 
   # 订阅开关（基于 nginx.conf 文件内容检测）
   local SUB_ENABLED=0
+<<<<<<< HEAD
   if [ -s "${WORK_DIR}/nginx.conf" ] && \
      grep -qE 'location ~ \^/[^/]+/auto \{' "${WORK_DIR}/nginx.conf" 2>/dev/null; then
+=======
+  if subscription_enabled; then
+>>>>>>> upstream/main
     SUB_ENABLED=1
     MENU_IDX+=(109) && MENU_KEY+=(subscribe) && MENU_VAL+=("$(text 109)")
   else
@@ -1211,11 +1269,9 @@ change_config() {
     return
   elif [ "$KEY" = "subscribe" ]; then
     # 订阅开关 — 检测 nginx.conf 中是否存在订阅分发 location 块
-    if grep -qE 'location ~ \^/[^/]+/auto \{' "${WORK_DIR}/nginx.conf" 2>/dev/null; then
+    if subscription_enabled; then
       # 已开启 → 关闭订阅
       info "\n $(text 109) "
-      # 检测 Argo 真实状态（Alpine 和 systemd 通用：检查守护进程文件是否存在）
-      [ -s ${ARGO_DAEMON_FILE} ] && IS_ARGO=is_argo || IS_ARGO=no_argo
       # 从旧 nginx.conf 读取 PORT_NGINX（确定文件存在，无需条件判断）
       PORT_NGINX=$(awk '/listen/{print $2; exit}' ${WORK_DIR}/nginx.conf)
       # 联动：若动态订阅已开启，先同步关闭并清理 CGI 进程 / socket / 守护 prestart
@@ -1269,6 +1325,7 @@ change_config() {
     # 前置校验：动态订阅依赖普通订阅，必须先开启普通订阅才能开启动态订阅。
     # 注意：关闭动态订阅时不受此限制（已开启动态必然满足此条件），因此校验放在最前不影响关闭。
 <<<<<<< HEAD
+<<<<<<< HEAD
     if ! grep -qE 'location ~ \^/[^/]+/auto \{' "${WORK_DIR}/nginx.conf" 2>/dev/null; then
       warning " $(text 198) " && return
     fi
@@ -1296,6 +1353,16 @@ change_config() {
       info "\n $(text 197) "
       # 必须先取 UUID_CONFIRM：否则会生成 location ~ ^//auto，静态订阅 URL 丢失 UUID 前缀。
 >>>>>>> upstream/main
+=======
+    ! subscription_enabled && warning " $(text 198) " && return
+    # 读取现有 nginx.conf 的反代端口
+    PORT_NGINX=$(awk '/listen/{print $2; exit}' ${WORK_DIR}/nginx.conf)
+
+    if dynamic_sub_enabled; then
+      # 已开启 → 仅关闭动态订阅，普通订阅保持开启；显式保留普通订阅避免被状态探测覆盖。
+      info "\n $(text 197) "
+      # 必须先取 UUID_CONFIRM：否则会生成 location ~ ^//auto，静态订阅 URL 丢失 UUID 前缀。
+>>>>>>> upstream/main
       fetch_nodes_value
       IS_DYNAMIC_SUB=no_dynamic_sub
       IS_SUB=is_sub
@@ -1305,10 +1372,15 @@ change_config() {
       rm -rf "$DYNAMIC_SUBSCRIBE_DIR"
       sing-box_systemd
 <<<<<<< HEAD
+<<<<<<< HEAD
       IS_SUB=is_sub
       export_list
       IS_SUB=is_sub
       info " $(text 201) "
+=======
+      export_list
+      info " $(text 200) "
+>>>>>>> upstream/main
 =======
       export_list
       info " $(text 200) "
@@ -1322,6 +1394,7 @@ change_config() {
     IS_SUB=is_sub
     IS_DYNAMIC_SUB=is_dynamic_sub
     fetch_nodes_value
+<<<<<<< HEAD
 <<<<<<< HEAD
     generate_render_script || { warning " $(text 203) "; return 1; }
     # 生成只读模板（占位符版），复用完整渲染逻辑但不触碰静态文件。
@@ -1352,6 +1425,19 @@ change_config() {
 =======
       warning " $(text 202) "
 >>>>>>> upstream/main
+=======
+    generate_render_script || { warning " $(text 202) "; dynamic_cleanup; return 1; }
+    # 生成只读模板（占位符版），不触碰静态订阅文件。
+    # 必须用子 shell：模板模式会改写 SERVER_IP/SUB_OUT_DIR/SUB_TPL_SRC，否则污染当前 shell。
+    ( export_list dynamic_template ) >/dev/null || { warning " $(text 202) "; dynamic_cleanup; return 1; }
+    dynamic_templates_ready || { warning " $(text 202) "; dynamic_cleanup; return 1; }
+    dynamic_meta_write || { warning " $(text 202) "; dynamic_cleanup; return 1; }
+    fcgiwrap_run || { warning " $(text 202) "; dynamic_cleanup; return 1; }
+    export_nginx_conf_file || { warning " $(text 202) "; dynamic_cleanup; return 1; }
+    # 生成后校验：确认订阅块与 FastCGI 块都已写入，否则中止并回滚，避免假成功
+    if ! subscription_enabled || ! dynamic_sub_enabled; then
+      warning " $(text 202) "
+>>>>>>> upstream/main
       IS_DYNAMIC_SUB=no_dynamic_sub
       export_nginx_conf_file
       fcgiwrap_stop
@@ -1360,11 +1446,17 @@ change_config() {
       return 1
     fi
     sing-box_systemd
+<<<<<<< HEAD
     nginx_sync
     export_list
 <<<<<<< HEAD
     info " $(text 200) "
 =======
+    info " $(text 199) "
+>>>>>>> upstream/main
+=======
+    nginx_sync || { warning " $(text 202) "; rollback_dynamic_subscription_on_install; return 1; }
+    export_list
     info " $(text 199) "
 >>>>>>> upstream/main
     return
@@ -1592,7 +1684,8 @@ input_nginx_port() {
   local NUM=$1
   local PORT_ERROR_TIME=6
   # 在脚本端口范围（MIN_PORT-MAX_PORT）内随机生成一个未被系统占用的默认端口（与 clash_api 共用 find_free_port）
-  local PORT_NGINX_DEFAULT=$(find_free_port)
+  local PORT_NGINX_DEFAULT=''
+  [ -z "$PORT_NGINX" ] && PORT_NGINX_DEFAULT=$(find_free_port)
   [[ "$IS_FAST_INSTALL" = 'is_fast_install' && -z "$PORT_NGINX" ]] && PORT_NGINX="$PORT_NGINX_DEFAULT"
   while true; do
     [[ "$PORT_ERROR_TIME" > 1 && "$PORT_ERROR_TIME" < 6 ]] && unset IN_USED PORT_NGINX
@@ -1614,7 +1707,7 @@ input_hopping_port() {
   local HOPPING_ERROR_TIME=6
 
   # 参数 / 快速安装模式：不交互。未指定端口跳跃时默认禁用。
-  if [[ "$NONINTERACTIVE_INSTALL" = 'noninteractive_install' || "$IS_FAST_INSTALL" = 'is_fast_install' ]]; then
+  if is_quiet_install; then
     HY2_PORT_HOPPING_RANGE=$(sed 's/[-－—：]/:/g' <<< "$HY2_PORT_HOPPING_RANGE" | tr -cd '0-9:')
     if [[ "$HY2_PORT_HOPPING_RANGE" =~ ^[0-9]{4,5}:[0-9]{4,5}$ ]]; then
       PORT_HOPPING_START=${HY2_PORT_HOPPING_RANGE%:*}
@@ -1674,7 +1767,7 @@ input_hy2_realm() {
   HY2_REALM_ID="${HY2_REALM_ID:-${UUID[12]:-${UUID_CONFIRM}}}"
 
   # 参数 / 快速安装模式：不交互，尊重 --HY2_REALM
-  if [[ "$NONINTERACTIVE_INSTALL" = 'noninteractive_install' || "$IS_FAST_INSTALL" = 'is_fast_install' ]]; then
+  if is_quiet_install; then
     if [ "$IS_HY2_REALM" = 'is_hy2_realm' ]; then
       HY2_REALM_ID="${HY2_REALM_ID:-${UUID_CONFIRM}}"
     else
@@ -2253,7 +2346,7 @@ change_warp_account_apply() {
 
 # 输入 Reality 密钥
 input_reality_key() {
-  [[ "$NONINTERACTIVE_INSTALL" != 'noninteractive_install' && "$IS_FAST_INSTALL" != 'is_fast_install' ]] && [ -z "$REALITY_PRIVATE" ] && reading "\n ${TOTAL_STEPS:+(${STEP_NUM}/${TOTAL_STEPS}) }$(text 70) " REALITY_PRIVATE
+  ! is_quiet_install && [ -z "$REALITY_PRIVATE" ] && reading "\n ${TOTAL_STEPS:+(${STEP_NUM}/${TOTAL_STEPS}) }$(text 70) " REALITY_PRIVATE
   [ -z "$REALITY_PRIVATE" ] && unset REALITY_PRIVATE && return
 
   local PRIVATEKEY_ERROR_TIME=5
@@ -2265,6 +2358,40 @@ input_reality_key() {
     # 即使 REALITY_PRIVATE 为空值，但 REALITY_PRIVATE 数组数量 ${REALITY_PRIVATE[@]} 为 1，影响后续的处理，所以要置空
     [ -z "$REALITY_PRIVATE" ] && unset REALITY_PRIVATE && break
   done
+}
+
+is_valid_argo_auth() {
+  local auth="${1:-}"
+  [[ "$auth" =~ TunnelSecret || "$auth" =~ [A-Z0-9a-z=]{120,250}$ || "${#auth}" =~ ^[3-6][0-9]$ ]]
+}
+
+# 安静安装的固定域名缺少认证时回退临时隧道，不进入交互询问。
+prepare_quiet_argo() {
+  is_quiet_install || return 0
+  if [ -n "${ARGO_DOMAIN:-}" ] && ! is_valid_argo_auth "${ARGO_AUTH:-}"; then
+    unset ARGO_DOMAIN ARGO_AUTH
+  fi
+  return 0
+}
+
+# 安静安装的 Nginx 端口使用空闲默认值；显式端口保持不变。
+prepare_quiet_nginx_port() {
+  is_quiet_install || return 0
+  [ -z "${PORT_NGINX:-}" ] && PORT_NGINX=$(find_free_port)
+  [[ ! "$PORT_NGINX" =~ ^[1-9][0-9]{1,4}$ || "$PORT_NGINX" -lt "$MIN_PORT" || "$PORT_NGINX" -gt "$MAX_PORT" ]] && error "\n $(text 3) \n"
+  is_port_in_use "$PORT_NGINX" && error "\n $(text 44) \n"
+  return 0
+}
+
+# 安静安装的起始端口必须完整可用，避免回退到交互重试。
+prepare_quiet_start_port() {
+  local num="$1" port=''
+  is_quiet_install || return 0
+  [[ ! "$START_PORT" =~ ^[1-9][0-9]{2,4}$ || "$START_PORT" -lt "$MIN_PORT" || "$START_PORT" -gt "$MAX_PORT" ]] && error "\n $(text 3) \n"
+  for ((port=START_PORT; port<START_PORT+num; port++)); do
+    is_port_in_use "$port" && error "\n $(text 44) \n"
+  done
+  return 0
 }
 
 # 输入 Argo 域名和认证信息
@@ -2281,16 +2408,16 @@ input_argo_auth() {
       reading "\n $(text 88) " ARGO_DOMAIN
       [ -n "$IS_CHANGE_ARGO" ] && ARGO_DOMAIN=$(sed 's/[ ]*//g; s/:[ ]*//' <<< "$ARGO_DOMAIN")
     done
-  elif [[ "$NONINTERACTIVE_INSTALL" != 'noninteractive_install' && "$IS_FAST_INSTALL" != 'is_fast_install' ]]; then
+  elif ! is_quiet_install; then
     [ -z "$ARGO_DOMAIN" ] && reading "\n ${TOTAL_STEPS:+(${STEP_NUM}/${TOTAL_STEPS}) }$(text 87) " ARGO_DOMAIN
     ARGO_DOMAIN=$(sed 's/[ ]*//g; s/:[ ]*//' <<< "$ARGO_DOMAIN")
   fi
 
-  if [[ ( -z "$ARGO_DOMAIN" || "$ARGO_DOMAIN" =~ trycloudflare\.com$ ) && ( "$IS_CHANGE_ARGO" = 'is_add_protocols' || "$IS_CHANGE_ARGO" = 'is_install' || "$NONINTERACTIVE_INSTALL" = 'noninteractive_install' ) ]]; then
+  if [[ -z "$ARGO_DOMAIN" || "$ARGO_DOMAIN" =~ trycloudflare\.com$ ]] && { [ "$IS_CHANGE_ARGO" = 'is_add_protocols' ] || [ "$IS_CHANGE_ARGO" = 'is_install' ] || is_quiet_install; }; then
     ARGO_RUNS="${WORK_DIR}/cloudflared tunnel --edge-ip-version auto --protocol http2 --no-autoupdate --url http://localhost:$PORT_NGINX"
   elif [ -n "${ARGO_DOMAIN}" ]; then
     if [ -z "${ARGO_AUTH}" ]; then
-      until [[ "$ARGO_AUTH" =~ TunnelSecret || "$ARGO_AUTH" =~ [A-Z0-9a-z=]{120,250}$ || "${#ARGO_AUTH}" =~ ^[3-6][0-9]$ ]]; do
+      until is_valid_argo_auth "$ARGO_AUTH"; do
         [ "$DOMAIN_ERROR_TIME" != 6 ] && warning "\n $(text 86) \n"
       (( DOMAIN_ERROR_TIME-- )) || true
         [ "$DOMAIN_ERROR_TIME" != 0 ] && hint "\n $(text 85) \n " && reading "\n $(text 118) " ARGO_AUTH || error "\n $(text 3) \n"
@@ -2422,10 +2549,53 @@ check_brutal() {
   [ "$IS_BRUTAL" = 'false' ] && command -v modprobe >/dev/null 2>&1 && modprobe brutal 2>/dev/null && IS_BRUTAL=true
 }
 
+# 只查询服务状态，不触发 daemon-reload 或服务启停。
+service_is_active() {
+  case "$SYSTEM" in
+    Alpine) rc-service "$1" status >/dev/null 2>&1 ;;
+    *) systemctl is-active --quiet "$1" >/dev/null 2>&1 ;;
+  esac
+}
+
+# Argo 状态的唯一探测入口：安装状态、运行状态和隧道类型只在这里读取。
+detect_argo_service() {
+  ARGO_INSTALLED=false
+  ARGO_RUNNING=false
+  ARGO_TYPE=''
+  IS_ARGO=no_argo
+  STATUS[1]=$(text 26)
+  [ -s "${ARGO_DAEMON_FILE}" ] || return 1
+
+  ARGO_INSTALLED=true
+  IS_ARGO=is_argo
+  STATUS[1]=$(text 27)
+
+  local ARGO_CONTENT=''
+  if [ "$SYSTEM" = 'Alpine' ]; then
+    ARGO_CONTENT=$(grep '^command_args=' "${ARGO_DAEMON_FILE}" 2>/dev/null)
+  else
+    ARGO_CONTENT=$(grep '^ExecStart' "${ARGO_DAEMON_FILE}" 2>/dev/null)
+  fi
+  if grep -q '\--token' <<< "$ARGO_CONTENT"; then
+    ARGO_TYPE=is_token_argo
+  elif grep -q '\--config' <<< "$ARGO_CONTENT"; then
+    ARGO_TYPE=is_json_argo
+  elif grep -q '\--url' <<< "$ARGO_CONTENT"; then
+    ARGO_TYPE=is_quicktunnel_argo
+  fi
+
+  if service_is_active argo; then
+    ARGO_RUNNING=true
+    STATUS[1]=$(text 28)
+  fi
+  return 0
+}
+
 # 查安装及运行状态，下标0: sing-box，下标1: argo，下标2: nginx；状态码: 26 未安装， 27 已安装未运行， 28 运行中
 check_install() {
   local PS_LIST=$(ps -eo pid,args | grep -E "$WORK_DIR.*([s]ing-box|[c]loudflared|[n]ginx)" | sed 's/^[ ]\+//g')
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   [[ "$IS_SUB" = 'is_sub' || -s ${WORK_DIR}/subscribe/qr ]] && IS_SUB=is_sub || IS_SUB=no_sub
   # 动态订阅状态以 nginx.conf 中的 FastCGI location 为唯一事实来源。
@@ -2445,6 +2615,15 @@ check_install() {
   # 动态订阅依赖普通订阅；nginx.conf 可能尚未刷新，不能覆盖显式意图。
   if [ -z "$IS_DYNAMIC_SUB" ]; then
     [ "$IS_SUB" = 'is_sub' ] && [ -s "${WORK_DIR}/nginx.conf" ] && grep -qE 'fastcgi_pass.*fcgiwrap\.sock' "${WORK_DIR}/nginx.conf" 2>/dev/null && IS_DYNAMIC_SUB=is_dynamic_sub || IS_DYNAMIC_SUB=no_dynamic_sub
+>>>>>>> upstream/main
+=======
+  # 订阅/动态订阅状态仅在未显式设置时探测，nginx.conf 是唯一事实来源。
+  if [ -z "$IS_SUB" ]; then
+    subscription_enabled && IS_SUB=is_sub || IS_SUB=no_sub
+  fi
+  # 动态订阅依赖普通订阅；nginx.conf 可能尚未刷新，不能覆盖显式意图。
+  if [ -z "$IS_DYNAMIC_SUB" ]; then
+    [ "$IS_SUB" = 'is_sub' ] && dynamic_sub_enabled && IS_DYNAMIC_SUB=is_dynamic_sub || IS_DYNAMIC_SUB=no_dynamic_sub
 >>>>>>> upstream/main
   fi
   if ls ${WORK_DIR}/conf/*${NODE_TAG[1]}_inbounds.json >/dev/null 2>&1; then
@@ -2517,17 +2696,6 @@ check_install() {
     fi
   fi
 
-  # 并发下载订阅模板 (clash, clash2, sing-box-template)，在新安装和更换协议时会用到
-  # 卸载模式跳过：纯浪费，且网络不通时会白白等待
-  if [ "$IS_UNINSTALL" != 'is_uninstall' ]; then
-    {
-      wget --no-check-certificate --continue --tries=2 --timeout=10 -qO $TEMP_DIR/clash ${GH_PROXY}${SUBSCRIBE_TEMPLATE}/clash 2>/dev/null &
-      wget --no-check-certificate --continue --tries=2 --timeout=10 -qO $TEMP_DIR/clash2 ${GH_PROXY}${SUBSCRIBE_TEMPLATE}/clash2 2>/dev/null &
-      wget --no-check-certificate --continue --tries=2 --timeout=10 -qO $TEMP_DIR/sing-box-template ${GH_PROXY}${SUBSCRIBE_TEMPLATE}/sing-box 2>/dev/null &
-      wait
-    } &
-  fi
-
   # 如果有需要，后台静默下载 sing-box（卸载模式跳过）
   if [ "${STATUS[0]}" = "$(text 26)" ] && [ ! -s ${WORK_DIR}/sing-box ] && [ "$IS_UNINSTALL" != 'is_uninstall' ]; then
     # 任务 1: 下载 sing-box
@@ -2570,36 +2738,9 @@ check_install() {
     NOW_CONSECUTIVE_PORTS=$(awk 'END { print NR }' <<< "$NOW_PORTS")
   fi
 
-  if [ "$NONINTERACTIVE_INSTALL" != 'noninteractive_install' ]; then
-    # 检查 Argo 服务状态
-    STATUS[1]=$(text 26) && IS_ARGO=no_argo
-    [ -s ${ARGO_DAEMON_FILE} ] && IS_ARGO=is_argo && STATUS[1]=$(text 27)
-    cmd_systemctl status argo &>/dev/null && STATUS[1]=$(text 28)
-  fi
-
-  # 检查 Argo 服务类型
-  if [ "$SYSTEM" = 'Alpine' ]; then
-    if [ -s ${ARGO_DAEMON_FILE} ]; then
-      local ARGO_CONTENT=$(grep '^command_args=' ${ARGO_DAEMON_FILE})
-      if grep -q '\--token' <<< "$ARGO_CONTENT"; then
-        ARGO_TYPE=is_token_argo
-      elif grep -q '\--config' <<< "$ARGO_CONTENT"; then
-        ARGO_TYPE=is_json_argo
-      elif grep -q '\--url' <<< "$ARGO_CONTENT"; then
-        ARGO_TYPE=is_quicktunnel_argo
-      fi
-    fi
-  else
-    if [ -s ${ARGO_DAEMON_FILE} ]; then
-      local ARGO_CONTENT=$(grep '^ExecStart' ${ARGO_DAEMON_FILE})
-      if grep -q '\--token' <<< "$ARGO_CONTENT"; then
-        ARGO_TYPE=is_token_argo
-      elif grep -q '\--config' <<< "$ARGO_CONTENT"; then
-        ARGO_TYPE=is_json_argo
-      elif grep -q '\--url' <<< "$ARGO_CONTENT"; then
-        ARGO_TYPE=is_quicktunnel_argo
-      fi
-    fi
+  # 非交互安装显式指定 ARGO 时尊重用户选择；其他场景统一由唯一入口探测。
+  if [ "$NONINTERACTIVE_INSTALL" != 'noninteractive_install' ] || [ "$ARGO_EXPLICIT" != 'true' ]; then
+    detect_argo_service
   fi
 
   # 如果有需要，后台静默下载 cloudflared（卸载模式跳过）
@@ -2644,13 +2785,14 @@ nginx_stop() {
 # 让 nginx 进程与最终配置状态保持一致：需要则启动/热重载，不需要则停止
 nginx_sync() {
   if [ -s ${WORK_DIR}/nginx.conf ]; then
+    nginx -t -c ${WORK_DIR}/nginx.conf >/dev/null 2>&1 || return 1
     if ps -eo pid,args | grep -qE "[n]ginx.*${WORK_DIR}/nginx.conf" 2>/dev/null; then
-      nginx -s reload -c ${WORK_DIR}/nginx.conf 2>/dev/null || true
+      nginx -s reload -c ${WORK_DIR}/nginx.conf 2>/dev/null || return 1
     else
-      nginx_run
+      nginx_run || return 1
     fi
   else
-    nginx_stop
+    nginx_stop || true
   fi
 }
 
@@ -2681,24 +2823,27 @@ cmd_systemctl() {
         ;;
     esac
   else
-    systemctl daemon-reload
     case "$1" in
       enable | disable )
+        systemctl daemon-reload
         systemctl "$1" --now "$2" >/dev/null 2>&1
         ;;
       restart )
+        systemctl daemon-reload
         systemctl restart "$2" >/dev/null 2>&1
         ;;
       reload )
+        systemctl daemon-reload
         systemctl reload sing-box >/dev/null 2>&1 || systemctl restart sing-box >/dev/null 2>&1
         [ -s ${WORK_DIR}/nginx.conf ] && nginx_sync
         local MAINPID=$(systemctl show -p MainPID sing-box 2>/dev/null | awk -F= '{print $2}')
         [ -n "$MAINPID" ] && [ "$MAINPID" -gt 0 ] 2>/dev/null && info "\n $(text 95) \n"
         ;;
       status )
-        systemctl is-active "$2"
+        service_is_active "$2"
         ;;
       * )
+        systemctl daemon-reload
         systemctl "$@" >/dev/null 2>&1
         ;;
     esac
@@ -3316,17 +3461,23 @@ sing-box_variables() {
       # 双栈均为 Cloudflare（或唯一出口为 CF），无法自动反选真实出口，需交互确认
       SERVER_IP_DEFAULT="${SERVER_IP_DEFAULT:-${WAN4:-$WAN6}}"
       local a=6
-      until [ -n "$SERVER_IP" ] && is_valid_server_addr "$SERVER_IP"; do
-        ((a--)) || true
-        [ "$a" = 0 ] && error "\n $(text 3) \n"
-        reading "\n (${STEP_NUM}/${TOTAL_STEPS:-?}) $(text 10) " SERVER_IP
-        [ -z "$SERVER_IP" ] && SERVER_IP="$SERVER_IP_DEFAULT"
-      done
+      if ! is_quiet_install; then
+        until [ -n "$SERVER_IP" ] && is_valid_server_addr "$SERVER_IP"; do
+          ((a--)) || true
+          [ "$a" = 0 ] && error "\n $(text 3) \n"
+          reading "\n (${STEP_NUM}/${TOTAL_STEPS:-?}) $(text 10) " SERVER_IP
+          [ -z "$SERVER_IP" ] && SERVER_IP="$SERVER_IP_DEFAULT"
+        done
+      fi
     fi
   elif [ -n "$WAN4" ]; then
     SERVER_IP_DEFAULT=$WAN4
   elif [ -n "$WAN6" ]; then
     SERVER_IP_DEFAULT=$WAN6
+  fi
+
+  if is_quiet_install && [ -n "$SERVER_IP" ] && ! is_valid_server_addr "$SERVER_IP"; then
+    error "\n $(text 47) \n"
   fi
 
   # 选择安装的协议，由于选项 a 为全部协议，所以选项数不是从 a 开始，而是从 b 开始，处理输入：把大写全部变为小写，把不符合的选项去掉，把重复的选项合并
@@ -3343,10 +3494,13 @@ sing-box_variables() {
   # 对选择协议的输入处理逻辑：先把所有的大写转为小写，并把所有没有去选项剔除掉，最后按输入的次序排序。如果选项为 a(all) 和其他选项并存，将会忽略 a，如 abc 则会处理为 bc
   [[ ! "${CHOOSE_PROTOCOLS,,}" =~ [b-$MAX_CHOOSE_PROTOCOLS] ]] && INSTALL_PROTOCOLS=($(eval echo {b..$MAX_CHOOSE_PROTOCOLS})) || INSTALL_PROTOCOLS=($(grep -o . <<< "$CHOOSE_PROTOCOLS" | sed "/[^b-$MAX_CHOOSE_PROTOCOLS]/d" | awk '!seen[$0]++'))
 
+  resolve_argo_for_protocols
+
   # 协议已确定，按实际选择重新计算总步骤数
   calc_install_steps
 
   # 显示选择协议及其次序，输入开始端口号
+  prepare_quiet_start_port ${#INSTALL_PROTOCOLS[@]}
   if [ -z "$START_PORT" ]; then
     (( STEP_NUM++ )) || true
     hint "\n $(text 60) "
@@ -3358,6 +3512,7 @@ sing-box_variables() {
 
   # 输出模式选择，输入用于订阅的 Nginx 服务端口号， 后台根据选择安装依赖
   if [[ "$IS_SUB" = 'is_sub' || "$IS_ARGO" = 'is_argo' ]]; then
+    prepare_quiet_nginx_port
     (( STEP_NUM++ )) || true
     input_nginx_port
   fi
@@ -3367,7 +3522,7 @@ sing-box_variables() {
     grep -q '^$' <<< "$SERVER_IP" && SERVER_IP="$SERVER_IP_DEFAULT"
   fi
   if [ -z "$SERVER_IP" ]; then
-    if [[ "$NONINTERACTIVE_INSTALL" = 'noninteractive_install' || "$IS_FAST_INSTALL" = 'is_fast_install' ]]; then
+    if is_quiet_install; then
       SERVER_IP="$SERVER_IP_DEFAULT"
     else
       (( STEP_NUM++ )) || true
@@ -3430,7 +3585,7 @@ sing-box_variables() {
   fi
 
   # 如果选择有 b j k 这些 reality 协议，自定义 reality 公私钥，如果没有则自动生成
-  if [ "$NONINTERACTIVE_INSTALL" != 'noninteractive_install' ] && [[ "${INSTALL_PROTOCOLS[@]}" =~ 'b'|'j'|'k' ]]; then
+  if ! is_quiet_install && [[ "${INSTALL_PROTOCOLS[@]}" =~ 'b'|'j'|'k' ]]; then
     (( STEP_NUM++ )) || true
     input_reality_key
   fi
@@ -3439,7 +3594,7 @@ sing-box_variables() {
   # 这三项属于 Hysteria2 子选项，不计入安装总步骤，也不显示步骤编号。
   if [[ "${INSTALL_PROTOCOLS[@]}" =~ 'c' ]]; then
     # Realm 与端口跳跃互斥：仅交互式安装提示；快速 / 非交互安装默认不使用 Realm，无需提示
-    [[ "$NONINTERACTIVE_INSTALL" != 'noninteractive_install' && "$IS_FAST_INSTALL" != 'is_fast_install' ]] && hint "\n $(text 186) \n"
+    ! is_quiet_install && hint "\n $(text 186) \n"
     input_hy2_realm
     local _SAVED_TOTAL_STEPS="$TOTAL_STEPS"
     TOTAL_STEPS=''
@@ -3451,12 +3606,17 @@ sing-box_variables() {
   if [[ "${INSTALL_PROTOCOLS[@]}" =~ 'h' ]]; then
     if [ "$IS_ARGO" = 'is_argo' ]; then
       if [ "$ARGO_READY" != 'argo_ready' ]; then
+        prepare_quiet_argo
         (( STEP_NUM++ )) || true
         input_argo_auth is_install
       fi
       local ARGO_READY=argo_ready
     else
       local DOMAIN_ERROR_TIME=5
+      if is_quiet_install && [ -z "$VMESS_HOST_DOMAIN" ]; then
+        TYPE=VMESS
+        error "\n $(text 211) \n"
+      fi
       until [ -n "$VMESS_HOST_DOMAIN" ]; do
         (( DOMAIN_ERROR_TIME-- )) || true
         [ "$DOMAIN_ERROR_TIME" != 0 ] && TYPE=VMESS && reading "\n $(text 50) " VMESS_HOST_DOMAIN || error "\n $(text 3) \n"
@@ -3473,6 +3633,10 @@ sing-box_variables() {
       local ARGO_READY=argo_ready
     else
       local DOMAIN_ERROR_TIME=5
+      if is_quiet_install && [ -z "$VLESS_HOST_DOMAIN" ]; then
+        TYPE=VLESS
+        error "\n $(text 211) \n"
+      fi
       until [ -n "$VLESS_HOST_DOMAIN" ]; do
         (( DOMAIN_ERROR_TIME-- )) || true
         [ "$DOMAIN_ERROR_TIME" != 0 ] && TYPE=VLESS && reading "\n $(text 50) " VLESS_HOST_DOMAIN || error "\n $(text 3) \n"
@@ -4202,9 +4366,22 @@ EOF
 # 设计原则：动态请求只读模板 + 写 stdout，绝不改写 list / 静态订阅 / 服务端配置。
 # 模板由 export_list(dynamic_template) 生成，直连节点地址写成三种占位符。
 
+<<<<<<< HEAD
 # 动态订阅开启状态（唯一事实来源：nginx.conf 含 fcgiwrap socket）
 dynamic_sub_enabled() {
   grep -qE 'fastcgi_pass.*fcgiwrap\.sock' "${WORK_DIR}/nginx.conf" 2>/dev/null
+=======
+# 普通订阅开启状态（唯一事实来源：nginx.conf 含订阅分发 location）
+subscription_enabled() {
+  [ -s "${WORK_DIR}/nginx.conf" ] && \
+    grep -qE 'location ~ \^/[^/]+/auto \{' "${WORK_DIR}/nginx.conf" 2>/dev/null
+}
+
+# 动态订阅开启状态（唯一事实来源：nginx.conf 含 fcgiwrap socket）
+dynamic_sub_enabled() {
+  subscription_enabled && \
+    grep -qE 'fastcgi_pass.*fcgiwrap\.sock' "${WORK_DIR}/nginx.conf" 2>/dev/null
+>>>>>>> upstream/main
 }
 
 # 获取固定隧道域名。兼容 Token / Json / API / YAML 配置；临时隧道（--url）不属于固定隧道。
@@ -4273,7 +4450,11 @@ render_subscribe_deps() {
     *) ${PACKAGE_INSTALL[int]} fcgiwrap spawn-fcgi >/dev/null 2>&1 ;;
   esac
 <<<<<<< HEAD
+<<<<<<< HEAD
   command -v fcgiwrap >/dev/null 2>&1 && command -v spawn-fcgi >/dev/null 2>&1 || { warning " $(text 202) "; return 1; }
+=======
+  command -v fcgiwrap >/dev/null 2>&1 && command -v spawn-fcgi >/dev/null 2>&1 || { warning " $(text 201) "; return 1; }
+>>>>>>> upstream/main
 =======
   command -v fcgiwrap >/dev/null 2>&1 && command -v spawn-fcgi >/dev/null 2>&1 || { warning " $(text 201) "; return 1; }
 >>>>>>> upstream/main
@@ -4294,12 +4475,27 @@ fcgiwrap_run() {
   # 生成幂等启动脚本，供守护进程 ExecStartPre / start_pre 调用
   cat > "$DYNAMIC_START_SCRIPT" <<EOF
 #!/usr/bin/env bash
+<<<<<<< HEAD
 [ -s "${DYNAMIC_PID_FILE}" ] && kill -0 "\$(cat "${DYNAMIC_PID_FILE}")" 2>/dev/null && exit 0
+=======
+if [ -s "${DYNAMIC_PID_FILE}" ] && kill -0 "\$(cat "${DYNAMIC_PID_FILE}")" 2>/dev/null && [ -S "${DYNAMIC_SOCKET}" ]; then
+  exit 0
+fi
+[ -s "${DYNAMIC_PID_FILE}" ] && kill "\$(cat "${DYNAMIC_PID_FILE}")" 2>/dev/null
+>>>>>>> upstream/main
 rm -f "${DYNAMIC_SOCKET}" "${DYNAMIC_PID_FILE}"
 $(command -v spawn-fcgi) -s "${DYNAMIC_SOCKET}" -M 0770 -P "${DYNAMIC_PID_FILE}" -- "${FCGI}" >/dev/null 2>&1
 EOF
   chmod +x "$DYNAMIC_START_SCRIPT"
+<<<<<<< HEAD
   [ -s "$DYNAMIC_PID_FILE" ] && kill -0 "$(cat "$DYNAMIC_PID_FILE")" 2>/dev/null && return 0
+=======
+  if [ -s "$DYNAMIC_PID_FILE" ] && kill -0 "$(cat "$DYNAMIC_PID_FILE")" 2>/dev/null && [ -S "$DYNAMIC_SOCKET" ]; then
+    return 0
+  fi
+  [ -s "$DYNAMIC_PID_FILE" ] && kill "$(cat "$DYNAMIC_PID_FILE")" 2>/dev/null
+  rm -f "$DYNAMIC_SOCKET" "$DYNAMIC_PID_FILE"
+>>>>>>> upstream/main
   spawn-fcgi -s "$DYNAMIC_SOCKET" -M 0770 -P "$DYNAMIC_PID_FILE" -- "$FCGI" >/dev/null 2>&1 || return 1
   # spawn-fcgi fork 后立即返回，socket 由子进程稍后创建；短暂重试避免时序误判
   local _retry=0
@@ -4316,9 +4512,64 @@ fcgiwrap_stop() {
   rm -f "$DYNAMIC_SOCKET" "$DYNAMIC_PID_FILE"
   rm -f "$DYNAMIC_RENDER_SCRIPT" "${DYNAMIC_RENDER_SCRIPT}.tmp"
 <<<<<<< HEAD
+<<<<<<< HEAD
   # 清理旧版内联 CGI 方案留下的 sing-box.sh 副本。
   rm -f "${WORK_DIR}/sing-box.sh"
 =======
+>>>>>>> upstream/main
+=======
+}
+
+# 清理动态订阅的全部运行时资源，不改普通订阅状态。
+dynamic_cleanup() {
+  fcgiwrap_stop
+  rm -rf "$DYNAMIC_SUBSCRIBE_DIR"
+  IS_DYNAMIC_SUB=no_dynamic_sub
+}
+
+# 本地探测动态订阅渲染端点，必须同时满足 HTTP 成功且响应非空。
+dynamic_probe() {
+  local probe_url="http://127.0.0.1:${PORT_NGINX}/${UUID_CONFIRM}/proxies"
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsS --max-time 5 "$probe_url" 2>/dev/null | grep -q .
+  else
+    wget -qO- --timeout=5 --tries=1 "$probe_url" 2>/dev/null | grep -q .
+  fi
+}
+
+# 安装期准备动态订阅。返回码：1=普通订阅未开启，2=依赖失败，3=渲染资源失败。
+prepare_dynamic_subscription_on_install() {
+  [ "$SUBSCRIBE_DYNAMIC_INTENT" = 'true' ] || return 0
+  [ "$IS_SUB" = 'is_sub' ] || return 1
+  render_subscribe_deps || return 2
+  generate_render_script || return 3
+  fcgiwrap_run || return 3
+  dynamic_meta_write || return 3
+  ( export_list dynamic_template >/dev/null ) || return 3
+  dynamic_templates_ready || return 3
+  IS_DYNAMIC_SUB=is_dynamic_sub
+  return 0
+}
+
+dynamic_templates_ready() {
+  local template_name=''
+  for template_name in proxies clash clash2 shadowrocket v2rayn throne sing-box; do
+    [ -s "${DYNAMIC_TEMPLATE_DIR}/${template_name}" ] || return 1
+  done
+  return 0
+}
+
+# 动态订阅失败时撤掉 FastCGI location、worker、动态目录和守护 prestart。
+rollback_dynamic_subscription_on_install() {
+  dynamic_cleanup
+  [ -n "$PORT_NGINX" ] && export_nginx_conf_file
+  sing-box_systemd
+  nginx_sync || true
+}
+
+dynamic_install_warning() {
+  local reason="$1"
+  warning "\n $(text 205 | sed "s/{reason}/$reason/g; s/{原因}/$reason/g") \n"
 >>>>>>> upstream/main
 }
 
@@ -4412,8 +4663,13 @@ _sb_render_subst_body() {
 sb_render_core() {
   local FORMAT="${SUB_FORMAT:-}" HOST="${CLIENT_HOST:-}" ADDR=''
   local ARGO_DOMAIN='' WAN4='' WAN6='' T_IP='' T_IP1='' T_IP2=''
+<<<<<<< HEAD
   local BAD='Status: 421\r\nContent-Type: text/plain; charset=utf-8\r\n\r\nInvalid Host\r\n'
   local EMPTY='Status: 404\r\nContent-Type: text/plain; charset=utf-8\r\n\r\nTemplate not found\r\n'
+=======
+  local BAD=$'Status: 421\r\nContent-Type: text/plain; charset=utf-8\r\n\r\nInvalid Host\r\n'
+  local EMPTY=$'Status: 404\r\nContent-Type: text/plain; charset=utf-8\r\n\r\nTemplate not found\r\n'
+>>>>>>> upstream/main
 
   if [[ "$HOST" == \[* ]]; then
     HOST="${HOST%%\]*}"
@@ -4476,8 +4732,11 @@ RENDER_SCRIPT_EOF
   fi
   chmod 700 "$DYNAMIC_RENDER_SCRIPT"
 <<<<<<< HEAD
+<<<<<<< HEAD
   # 清理旧版内联 CGI 方案留下的 sing-box.sh 副本。
   rm -f "${WORK_DIR}/sing-box.sh"
+=======
+>>>>>>> upstream/main
 =======
 >>>>>>> upstream/main
 }
@@ -4500,7 +4759,11 @@ dynamic_subscribe_output() {
   # SERVER_IP 是域名（非 IPv4、非 IPv6）时才输出域名行
   if [ -n "$SERVER_IP" ] && [[ "$SERVER_IP" != *:* ]] && [[ ! "$SERVER_IP" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
 <<<<<<< HEAD
+<<<<<<< HEAD
     LABEL="$(text 204)"
+=======
+    LABEL="$(text 203)"
+>>>>>>> upstream/main
 =======
     LABEL="$(text 203)"
 >>>>>>> upstream/main
@@ -4509,7 +4772,11 @@ dynamic_subscribe_output() {
   fi
   if [ -n "$ARGO_DOMAIN" ]; then
 <<<<<<< HEAD
+<<<<<<< HEAD
     LABEL="$(text 205)"
+=======
+    LABEL="$(text 204)"
+>>>>>>> upstream/main
 =======
     LABEL="$(text 204)"
 >>>>>>> upstream/main
@@ -4520,6 +4787,17 @@ dynamic_subscribe_output() {
   printf '%b' "$DYN_LINES"
 }
 
+<<<<<<< HEAD
+=======
+# 从动态地址列表取首个可用 URL（IPv4→IPv6→域名→隧道），列表为空时返回空。
+dynamic_first_subscribe_url() {
+  local suffix="${1:-auto}" dynamic_output=''
+  dynamic_output=$(dynamic_subscribe_output "$suffix")
+  [ -z "$dynamic_output" ] && return 0
+  printf '%s\n' "$dynamic_output" | sed -n 's#^[[:space:]]*[^:]*:[[:space:]]*\(http[s]*://.*\)$#\1#p' | head -1
+}
+
+>>>>>>> upstream/main
 export_nginx_conf_file() {
   # 在添加协议，需要用到 nginx 的时候，先检测是否已经安装
   if ! command -v nginx >/dev/null 2>&1; then
@@ -4702,6 +4980,98 @@ is_valid_server_addr() {
   # 域名标签允许中间下划线（如 test_ipv4.example.com 这类 DDNS/测试域名），首尾仍限定字母数字
   [[ "$_ADDR" =~ ^[a-zA-Z0-9]([a-zA-Z0-9_-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9_-]{0,61}[a-zA-Z0-9])?)+$ ]] && return 0
   return 1
+}
+
+# 统一解析 SUBSCRIBE 三态：dynamic=普通订阅+安装后开启动态；true=仅普通订阅；
+# false=关闭订阅；留空由安装入口按默认值处理。
+parse_subscribe_value() {
+  local _val="${1:-}" _normalized=''
+  [ -z "$_val" ] && return 0
+  _normalized=$(printf '%s' "$_val" | tr '[:upper:]' '[:lower:]')
+  SUBSCRIBE_EXPLICIT=true
+  SUBSCRIBE_DYNAMIC_INTENT=false
+  case "$_normalized" in
+    dynamic )
+      IS_SUB=is_sub
+      # 这里只记录安装意图；实际启用状态仍由 nginx.conf 探测。
+      IS_DYNAMIC_SUB=''
+      SUBSCRIBE_DYNAMIC_INTENT=true
+      ;;
+    true|y|yes|1 )
+      IS_SUB=is_sub
+      IS_DYNAMIC_SUB=no_dynamic_sub
+      ;;
+    false|n|no|0 )
+      IS_SUB=no_sub
+      IS_DYNAMIC_SUB=no_dynamic_sub
+      ;;
+    * )
+      VALUE="$_val"
+      L="${L:-E}"
+      error "\n $(text 214) \n"
+      ;;
+  esac
+}
+
+# 读取 -f 配置文件并统一映射为脚本内部变量。
+# 仅处理有明确规则的字段；交互安装继续使用原输入流程，安静安装按规则补齐或报错。
+load_config_file() {
+  local config_file="$1"
+  ARGO_EXPLICIT=false
+  SUBSCRIBE_EXPLICIT=false
+  SUBSCRIBE_DYNAMIC_INTENT=false
+  . "$config_file"
+  NONINTERACTIVE_INSTALL=noninteractive_install
+
+  [ -n "${LANGUAGE:-}" ] && L=${LANGUAGE^^}
+  if [ -n "${ARGO:-}" ]; then
+    ARGO_EXPLICIT=true
+    case "$(printf '%s' "$ARGO" | tr '[:upper:]' '[:lower:]')" in
+      true|y|yes|1) IS_ARGO=is_argo ;;
+      *) IS_ARGO=no_argo ;;
+    esac
+  fi
+
+  # 配置文件使用 PORT_HOPPING_RANGE，脚本内部统一使用 HY2_PORT_HOPPING_RANGE。
+  HY2_PORT_HOPPING_RANGE="${HY2_PORT_HOPPING_RANGE:-${PORT_HOPPING_RANGE:-}}"
+  case "$(printf '%s' "${HY2_REALM:-}" | tr '[:upper:]' '[:lower:]')" in
+    true|y|yes|1) IS_HY2_REALM=is_hy2_realm ;;
+    false|n|no|0) unset IS_HY2_REALM ;;
+  esac
+
+  parse_subscribe_value "${SUBSCRIBE:-}"
+  # 空标量在 Bash 中仍算一个数组元素，必须转为“未设置”才能触发生成逻辑。
+  [ -z "${REALITY_PRIVATE:-}" ] && unset REALITY_PRIVATE
+  [ -z "${REALITY_PUBLIC:-}" ] && unset REALITY_PUBLIC
+
+  unset LANGUAGE ARGO HY2_REALM PORT_HOPPING_RANGE SUBSCRIBE
+}
+
+# 安静安装模式：不发起交互询问，缺省值由安装入口统一补齐。
+is_quiet_install() {
+  [ "$NONINTERACTIVE_INSTALL" = 'noninteractive_install' ] || [ "$IS_FAST_INSTALL" = 'is_fast_install' ]
+}
+
+# 安静安装的确定性默认值；有值的字段全部保留。
+apply_quiet_defaults() {
+  [ -z "$L" ] && L=E
+  CHOOSE_PROTOCOLS=${CHOOSE_PROTOCOLS:-'a'}
+  START_PORT=${START_PORT:-"$START_PORT_DEFAULT"}
+  CDN=${CDN:-"${CDN_DOMAIN[0]}"}
+  [ "$SUBSCRIBE_EXPLICIT" != 'true' ] && IS_SUB=is_sub
+  return 0
+}
+
+# 未显式指定 Argo 时，安静安装按实际选中的 WS 协议自动推导。
+resolve_argo_for_protocols() {
+  is_quiet_install || return 0
+  [ "$ARGO_EXPLICIT" != 'true' ] || return 0
+  IS_ARGO=no_argo
+  local protocol=''
+  for protocol in "${INSTALL_PROTOCOLS[@]}"; do
+    [[ "$protocol" == 'h' || "$protocol" == 'i' ]] && { IS_ARGO=is_argo; break; }
+  done
+  return 0
 }
 
 # 在脚本限制的端口范围内（MIN_PORT-MAX_PORT）随机找一个未被系统占用的端口。
@@ -4957,12 +5327,18 @@ sing-box_json() {
   fi
 
   # 生成 Reality 公私钥，第一次安装的时候，如有指定的私钥，则使用该私钥及生成对应的公钥；如没有指定私钥则使用新生成的；添加协议的时，使用相应数组里的第一个非空值，如全空则像第一次安装那样使用新生成的
+  if [ "$IS_CHANGE" != 'change' ] && [ -n "$REALITY_PRIVATE" ] && ! [[ "$REALITY_PRIVATE" =~ ^[A-Za-z0-9_-]{43}$ ]]; then
+    error "\n $(text 114) \n"
+  fi
   generate_reality_keypair() {
     [ "$1" = 'convert_error' ] && hint " $(text 116) "
     REALITY_KEYPAIR=$($DIR/sing-box generate reality-keypair) && REALITY_PRIVATE=$(awk '/PrivateKey/{print $NF}' <<< "$REALITY_KEYPAIR") && REALITY_PUBLIC=$(awk '/PublicKey/{print $NF}' <<< "$REALITY_KEYPAIR")
   }
 
-  if [[ "${#REALITY_PRIVATE}" = 43 && "${#REALITY_PUBLIC}" = 0 ]]; then
+  # -f 配置文件未提供 Reality 公私钥时，直接复用现有函数生成完整密钥对。
+  if [ -n "$CONFIG_FILE" ] && [ -z "$REALITY_PUBLIC" ] && [ -z "$REALITY_PRIVATE" ]; then
+    generate_reality_keypair
+  elif [[ "${#REALITY_PRIVATE}" = 43 && "${#REALITY_PUBLIC}" = 0 ]]; then
     if command -v xxd >/dev/null 2>&1; then
       until [ -n "$REALITY_PUBLIC" ]; do
         # convert base64url -> base64 (standard), add padding
@@ -5293,7 +5669,7 @@ EOF
   CHECK_PROTOCOLS=$(asc "$CHECK_PROTOCOLS" ++)
   if [[ "${INSTALL_PROTOCOLS[@]}" =~ "$CHECK_PROTOCOLS" ]]; then
     [ -z "$PORT_VMESS_WS" ] && PORT_VMESS_WS=$[START_PORT+$(awk -v target=$CHECK_PROTOCOLS '{ for(i=1; i<=NF; i++) if($i == target) { print i-1; break } }' <<< "${INSTALL_PROTOCOLS[*]}")]
-    NODE_NAME[17]=${NODE_NAME[17]:-"$NODE_NAME_CONFIRM"} && UUID[17]=${UUID[17]:-"$UUID_CONFIRM"} && WS_SERVER_IP[17]=${WS_SERVER_IP[17]:-"$SERVER_IP"} && CDN[17]=${CDN[17]:-"$CDN"} && CDN_PORT[17]=${CDN_PORT[17]:-${CDN_PORT:-80}} && VMESS_WS_PATH=${VMESS_WS_PATH:-"${UUID[17]}-vmess"}
+    NODE_NAME[17]=${NODE_NAME[17]:-"$NODE_NAME_CONFIRM"} && UUID[17]=${UUID[17]:-"$UUID_CONFIRM"} && WS_SERVER_IP[17]=${WS_SERVER_IP[17]:-"$SERVER_IP"} && CDN[17]=${CDN[17]:-"$CDN"} && CDN_PORT[17]=${CDN_PORT[17]:-${CDN_PORT:-443}} && VMESS_WS_PATH=${VMESS_WS_PATH:-"${UUID[17]}-vmess"}
     cat > ${WORK_DIR}/conf/17_${NODE_TAG[6]}_inbounds.json << EOF
 //  "WS_SERVER_IP_SHOW": "${WS_SERVER_IP[17]}"
 //  "VMESS_HOST_DOMAIN": "${VMESS_HOST_DOMAIN}${ARGO_DOMAIN}"
@@ -5759,7 +6135,7 @@ EOF
 
 # 获取原有各协议的参数，先清空所有的 key-value
 fetch_nodes_value() {
-  unset NODE_NAME PORT_XTLS_REALITY UUID TLS_SERVER REALITY_PRIVATE REALITY_PUBLIC PORT_HYSTERIA2 HY2_REALM_ID IS_HY2_REALM IS_HY2_IGNORE PORT_TUIC TUIC_PASSWORD TUIC_CONGESTION_CONTROL PORT_SHADOWTLS SHADOWTLS_PASSWORD SHADOWSOCKS_METHOD PORT_SHADOWSOCKS PORT_TROJAN TROJAN_PASSWORD PORT_VMESS_WS VMESS_WS_PATH WS_SERVER_IP WS_SERVER_IP_SHOW VMESS_HOST_DOMAIN CDN CDN_PORT PORT_VLESS_WS VLESS_WS_PATH VLESS_HOST_DOMAIN PORT_H2_REALITY PORT_GRPC_REALITY ARGO_DOMAIN PORT_ANYTLS PORT_NAIVE PORT_SNELL SELF_SIGNED_FINGERPRINT_SHA256 SELF_SIGNED_FINGERPRINT_BASE64 IS_XTLS_MULTIPLEX
+  unset NODE_NAME PORT_XTLS_REALITY UUID TLS_SERVER REALITY_PRIVATE REALITY_PUBLIC PORT_HYSTERIA2 HY2_REALM_ID IS_HY2_REALM IS_HY2_IGNORE PORT_TUIC TUIC_PASSWORD TUIC_CONGESTION_CONTROL PORT_SHADOWTLS SHADOWTLS_PASSWORD SHADOWSOCKS_METHOD PORT_SHADOWSOCKS PORT_TROJAN TROJAN_PASSWORD PORT_VMESS_WS VMESS_WS_PATH WS_SERVER_IP WS_SERVER_IP_SHOW VMESS_HOST_DOMAIN CDN CDN_PORT PORT_VLESS_WS VLESS_WS_PATH VLESS_HOST_DOMAIN PORT_H2_REALITY PORT_GRPC_REALITY PORT_ANYTLS PORT_NAIVE PORT_SNELL SELF_SIGNED_FINGERPRINT_SHA256 SELF_SIGNED_FINGERPRINT_BASE64 IS_XTLS_MULTIPLEX
 
   # 获取公共数据
   ls ${WORK_DIR}/conf/*-ws*inbounds.json >/dev/null 2>&1 && SERVER_IP=$(awk -F '"' '/"WS_SERVER_IP_SHOW"/{print $4; exit}' ${WORK_DIR}/conf/*-ws*inbounds.json) || SERVER_IP=$([ -s ${WORK_DIR}/list ] && grep -A1 '"tag"' ${WORK_DIR}/list | sed -E '/-ws(-tls)*",$/{N;d}' | awk -F '"' '/"server"/{count++; if (count == 1) {print $4; exit}}')
@@ -5767,8 +6143,8 @@ fetch_nodes_value() {
   START_PORT=$(awk 'NR == 1 { min = $0 } { if ($0 < min) min = $0; count++ } END {print min}' <<< "$EXISTED_PORTS")
   [[ -z "$NODE_NAME_CONFIRM" && -s ${WORK_DIR}/subscribe/clash ]] && NODE_NAME_CONFIRM=$(awk -F "'" '/u: &u/{print $2; exit}' ${WORK_DIR}/subscribe/clash)
 
-  # 如有 Argo，获取 Argo Tunnel
-  [[ ${STATUS[1]} =~ $(text 27)|$(text 28) ]] && grep -q '\--url' ${ARGO_DAEMON_FILE} && { cmd_systemctl enable argo; sleep 2 && cmd_systemctl status argo &>/dev/null && fetch_quicktunnel_domain; }
+  # 如有临时 Argo Tunnel，仅在服务未运行或域名尚未取得时启动 / 获取域名。
+  ensure_quicktunnel_domain
 
   # 获取 UUID_CONFIRM（从 JSON 配置文件读取，不依赖 nginx）
   # 如 UUID_CONFIRM 已有值（例如上层已交互输入），跳过 JSON 读取，避免重复弹窗
@@ -5836,10 +6212,12 @@ fetch_nodes_value() {
   [ -s ${WORK_DIR}/conf/*_${NODE_TAG[5]}_inbounds.json ] && local JSON=$(cat ${WORK_DIR}/conf/*_${NODE_TAG[5]}_inbounds.json) && NODE_NAME[16]=$(sed -n "s/.*\"tag\":\"\(.*\) ${NODE_TAG[5]}.*/\1/p" <<< "$JSON") && PORT_TROJAN=$(sed -n 's/.*"listen_port":\([0-9]\+\),/\1/gp' <<< "$JSON") && TROJAN_PASSWORD=$(awk -F '"' '/"password"/{print $4}' <<< "$JSON")
 
   # 获取 vmess + ws key-value
-  [ -s ${WORK_DIR}/conf/*_${NODE_TAG[6]}_inbounds.json ] && local JSON=$(cat ${WORK_DIR}/conf/*_${NODE_TAG[6]}_inbounds.json) && NODE_NAME[17]=$(sed -n "s/.*\"tag\":\"\(.*\) ${NODE_TAG[6]}.*/\1/p" <<< "$JSON") && PORT_VMESS_WS=$(sed -n 's/.*"listen_port":\([0-9]\+\),/\1/gp' <<< "$JSON") && UUID[17]=$(awk -F '"' '/"uuid"/{print $4}' <<< "$JSON") && VMESS_WS_PATH=$(sed -n 's#.*"path":"/\(.*\)",#\1#p' <<< "$JSON") && WS_SERVER_IP[17]=$(awk  -F '"' '/"WS_SERVER_IP_SHOW"/{print $4}' <<< "$JSON") && CDN[17]=$(awk  -F '"' '/"CDN"/{print $4}' <<< "$JSON") && CDN_PORT[17]=$(awk  -F '"' '/"CDN_PORT"/{print $4}' <<< "$JSON") && [[ "${STATUS[1]}" =~ $(text 27)|$(text 28) ]] && ARGO_DOMAIN=$(awk  -F '"' '/"VMESS_HOST_DOMAIN"/{print $4}' <<< "$JSON") || VMESS_HOST_DOMAIN=$(awk  -F '"' '/"VMESS_HOST_DOMAIN"/{print $4}' <<< "$JSON")
+  [ -s ${WORK_DIR}/conf/*_${NODE_TAG[6]}_inbounds.json ] && local JSON=$(cat ${WORK_DIR}/conf/*_${NODE_TAG[6]}_inbounds.json) && NODE_NAME[17]=$(sed -n "s/.*\"tag\":\"\(.*\) ${NODE_TAG[6]}.*/\1/p" <<< "$JSON") && PORT_VMESS_WS=$(sed -n 's/.*"listen_port":\([0-9]\+\),/\1/gp' <<< "$JSON") && UUID[17]=$(awk -F '"' '/"uuid"/{print $4}' <<< "$JSON") && VMESS_WS_PATH=$(sed -n 's#.*"path":"/\(.*\)",#\1#p' <<< "$JSON") && WS_SERVER_IP[17]=$(awk  -F '"' '/"WS_SERVER_IP_SHOW"/{print $4}' <<< "$JSON") && CDN[17]=$(awk  -F '"' '/"CDN"/{print $4}' <<< "$JSON") && CDN_PORT[17]=$(awk  -F '"' '/"CDN_PORT"/{print $4}' <<< "$JSON") && [ "$IS_ARGO" = 'is_argo' ] && ARGO_DOMAIN=$(awk  -F '"' '/"VMESS_HOST_DOMAIN"/{print $4}' <<< "$JSON") || VMESS_HOST_DOMAIN=$(awk  -F '"' '/"VMESS_HOST_DOMAIN"/{print $4}' <<< "$JSON")
+#### vmess 从原来的 notls 改为 tls 才能通，这个判断保留至 2027年2月28日
+  [ -n "$PORT_VMESS_WS" ] && [ "$CDN_PORT[17]" = '80' ] && CDN_PORT[17]='443'
 
   # 获取 vless + ws + tls key-value
-  [ -s ${WORK_DIR}/conf/*_${NODE_TAG[7]}_inbounds.json ] && local JSON=$(cat ${WORK_DIR}/conf/*_${NODE_TAG[7]}_inbounds.json) && NODE_NAME[18]=$(sed -n "s/.*\"tag\":\"\(.*\) ${NODE_TAG[7]}.*/\1/p" <<< "$JSON") && PORT_VLESS_WS=$(sed -n 's/.*"listen_port":\([0-9]\+\),/\1/gp' <<< "$JSON") && UUID[18]=$(awk -F '"' '/"uuid"/{print $4}' <<< "$JSON") && VLESS_WS_PATH=$(sed -n 's#.*"path":"/\(.*\)",#\1#p' <<< "$JSON") && WS_SERVER_IP[18]=$(awk  -F '"' '/"WS_SERVER_IP_SHOW"/{print $4}' <<< "$JSON") && CDN[18]=$(awk  -F '"' '/"CDN"/{print $4}' <<< "$JSON") && [[ "${STATUS[1]}" =~ $(text 27)|$(text 28) ]] && CDN_PORT[18]=$(awk  -F '"' '/"CDN_PORT"/{print $4}' <<< "$JSON") && ARGO_DOMAIN=$(awk -F '"' '/"server_name"/{print $4}' <<< "$JSON") || VLESS_HOST_DOMAIN=$(awk -F '"' '/"server_name"/{print $4}' <<< "$JSON")
+  [ -s ${WORK_DIR}/conf/*_${NODE_TAG[7]}_inbounds.json ] && local JSON=$(cat ${WORK_DIR}/conf/*_${NODE_TAG[7]}_inbounds.json) && NODE_NAME[18]=$(sed -n "s/.*\"tag\":\"\(.*\) ${NODE_TAG[7]}.*/\1/p" <<< "$JSON") && PORT_VLESS_WS=$(sed -n 's/.*"listen_port":\([0-9]\+\),/\1/gp' <<< "$JSON") && UUID[18]=$(awk -F '"' '/"uuid"/{print $4}' <<< "$JSON") && VLESS_WS_PATH=$(sed -n 's#.*"path":"/\(.*\)",#\1#p' <<< "$JSON") && WS_SERVER_IP[18]=$(awk  -F '"' '/"WS_SERVER_IP_SHOW"/{print $4}' <<< "$JSON") && CDN[18]=$(awk  -F '"' '/"CDN"/{print $4}' <<< "$JSON") && [ "$IS_ARGO" = 'is_argo' ] && CDN_PORT[18]=$(awk  -F '"' '/"CDN_PORT"/{print $4}' <<< "$JSON") && ARGO_DOMAIN=$(awk -F '"' '/"server_name"/{print $4}' <<< "$JSON") || VLESS_HOST_DOMAIN=$(awk -F '"' '/"server_name"/{print $4}' <<< "$JSON")
 
   # 获取 H2 + Reality key-value
   [ -s ${WORK_DIR}/conf/*_${NODE_TAG[8]}_inbounds.json ] && local JSON=$(cat ${WORK_DIR}/conf/*_${NODE_TAG[8]}_inbounds.json) && NODE_NAME[19]=$(sed -n "s/.*\"tag\":\"\(.*\) ${NODE_TAG[8]}.*/\1/p" <<< "$JSON") && PORT_H2_REALITY=$(sed -n 's/.*"listen_port":\([0-9]\+\),/\1/gp' <<< "$JSON") && UUID[19]=$(awk -F '"' '/"uuid"/{print $4}' <<< "$JSON") && REALITY_PRIVATE[19]=$(awk -F '"' '/"private_key"/{print $4}' <<< "$JSON") && REALITY_PUBLIC[19]=$(awk -F '"' '/"public_key"/{print $4}' <<< "$JSON")
@@ -5898,8 +6276,30 @@ fetch_quicktunnel_domain() {
   [ -s ${WORK_DIR}/conf/18_${NODE_TAG[7]}_inbounds.json ] && sed -i "s/\"server_name\":.*/\"server_name\": \"$ARGO_DOMAIN\",/" ${WORK_DIR}/conf/18_${NODE_TAG[7]}_inbounds.json
 }
 
+# 确保临时隧道已运行并取得当前域名。已运行的隧道直接复用域名，避免重复探测和启停。
+ensure_quicktunnel_domain() {
+  [ "$IS_INSTALL" != 'dynamic_template' ] || return 0
+  [ -s "${ARGO_DAEMON_FILE}" ] && grep -q '\--url' "${ARGO_DAEMON_FILE}" 2>/dev/null || return 0
+  [ "$ARGO_RUNNING" = 'true' ] && [ -n "$ARGO_DOMAIN" ] && return 0
+
+  if [ "$ARGO_RUNNING" != 'true' ]; then
+    cmd_systemctl enable argo
+    sleep 2
+    if service_is_active argo; then
+      ARGO_RUNNING=true
+      STATUS[1]=$(text 28)
+    else
+      ARGO_RUNNING=false
+      STATUS[1]=$(text 27)
+      return 1
+    fi
+  fi
+  fetch_quicktunnel_domain
+}
+
 # 安装 sing-box 全家桶
 install_sing-box() {
+  local dynamic_install_status=0 dynamic_install_reason=''
   sing-box_variables
   if [ -n "$PORT_NGINX" ] && ! command -v nginx >/dev/null 2>&1; then
     info "\n $(text 7) nginx \n"
@@ -5916,6 +6316,8 @@ install_sing-box() {
   cp $TEMP_DIR/sing-box $TEMP_DIR/jq ${WORK_DIR}
   [ -x $TEMP_DIR/qrencode ] && cp $TEMP_DIR/qrencode ${WORK_DIR}
 
+  ! ${WORK_DIR}/sing-box check -C ${WORK_DIR}/conf && error "\n $(text 213) \n"
+
   # 生成 Argo systemd 配置文件，并复制 cloudflared 可执行二进制文件
   cp $TEMP_DIR/cloudflared ${WORK_DIR}
   [ -n "$ARGO_RUNS" ] && argo_systemd
@@ -5923,8 +6325,37 @@ install_sing-box() {
   # 如果是 Json Argo，把配置文件复制到工作目录
   [ -n "$ARGO_JSON" ] && cp $TEMP_DIR/tunnel.* ${WORK_DIR}
 
+  # SUBSCRIBE=dynamic：先生成动态订阅资源，再写 nginx.conf，确保 FastCGI
+  # location、worker 守护钩子与最终配置同时生效。失败只降级，不中断主安装。
+  if [ "$SUBSCRIBE_DYNAMIC_INTENT" = 'true' ]; then
+    prepare_dynamic_subscription_on_install
+    dynamic_install_status=$?
+    if [ "$dynamic_install_status" -ne 0 ]; then
+      case "$dynamic_install_status" in
+        1 ) dynamic_install_reason="$(text 198)" ;;
+        2 ) dynamic_install_reason="$(text 201)" ;;
+        * ) dynamic_install_reason="$(text 202)" ;;
+      esac
+      dynamic_cleanup
+      dynamic_install_warning "$dynamic_install_reason"
+    fi
+  fi
+
   # 生成 Nginx 配置文件（先于守护文件，确保 ExecStartPre / start_pre 与最终状态一致）
-  [ -n "$PORT_NGINX" ] && export_nginx_conf_file
+  if [ -n "$PORT_NGINX" ]; then
+    if ! export_nginx_conf_file; then
+      if [ "$SUBSCRIBE_DYNAMIC_INTENT" = 'true' ] && [ "$IS_DYNAMIC_SUB" = 'is_dynamic_sub' ]; then
+        dynamic_install_reason="$(text 202)"
+        rollback_dynamic_subscription_on_install
+        dynamic_install_warning "$dynamic_install_reason"
+      fi
+    elif [ "$SUBSCRIBE_DYNAMIC_INTENT" = 'true' ] && [ "$IS_DYNAMIC_SUB" = 'is_dynamic_sub' ] && \
+         ! dynamic_sub_enabled; then
+      dynamic_install_reason="$(text 202)"
+      rollback_dynamic_subscription_on_install
+      dynamic_install_warning "$dynamic_install_reason"
+    fi
+  fi
 
   # 生成 sing-box systemd 配置文件
   sing-box_systemd
@@ -5944,9 +6375,32 @@ install_sing-box() {
     info "\n Sing-box $(text 28) $(text 37) \n"
   else
     STATUS[0]=$(text 27)
-    error "\n Sing-box $(text 27) $(text 38) \n"
-    # 如果启动失败，再尝试重启
-    cmd_systemctl restart sing-box
+    if [ "$SUBSCRIBE_DYNAMIC_INTENT" = 'true' ] && [ "$IS_DYNAMIC_SUB" = 'is_dynamic_sub' ]; then
+      # 动态 FastCGI 配置若导致服务启动失败，先撤掉动态资源并重试静态安装。
+      dynamic_install_reason="$(text 206)"
+      rollback_dynamic_subscription_on_install
+      cmd_systemctl restart sing-box
+      if cmd_systemctl status sing-box &>/dev/null; then
+        STATUS[0]=$(text 28)
+        info "\n Sing-box $(text 28) $(text 37) \n"
+      else
+        error "\n $(text 213) \n"
+      fi
+      dynamic_install_warning "$dynamic_install_reason"
+    else
+      error "\n $(text 213) \n"
+    fi
+  fi
+
+  # 服务已启动后探测动态端点；失败时回滚到干净的静态订阅状态。
+  if [ "$SUBSCRIBE_DYNAMIC_INTENT" = 'true' ] && [ "$IS_DYNAMIC_SUB" = 'is_dynamic_sub' ]; then
+    if dynamic_probe; then
+      info "\n $(text 199) \n"
+    else
+      dynamic_install_reason="$(text 207)"
+      rollback_dynamic_subscription_on_install
+      dynamic_install_warning "$dynamic_install_reason"
+    fi
   fi
 
   # 如果配置了 Argo，也启动 Argo 服务
@@ -5958,29 +6412,71 @@ install_sing-box() {
     # 检查 Argo 服务是否成功启动
     if cmd_systemctl status argo &>/dev/null; then
       STATUS[1]=$(text 28)
+      ARGO_RUNNING=true
       info "\n Argo $(text 28) $(text 37) \n"
     else
       STATUS[1]=$(text 27)
-      error "\n Argo $(text 27) $(text 38) \n"
-      # 如果启动失败，再尝试重启
+      warning "\n Argo $(text 27) $(text 38) \n"
+      # 如果启动失败，再尝试重启一次。
       cmd_systemctl restart argo
+      if cmd_systemctl status argo &>/dev/null; then
+        ARGO_RUNNING=true
+        STATUS[1]=$(text 28)
+        info "\n Argo $(text 28) $(text 37) \n"
+      else
+        error "\n Argo $(text 27) $(text 38) \n"
+      fi
     fi
   fi
+}
+
+# 幂等准备订阅模板。下载先写 .part 再原子替换，避免动态模板复制到半写入文件。
+ensure_subscription_templates() {
+  local TPL_NAME TPL_URL TPL_FILE TPL_PART MISSING=false
+  for TPL_NAME in clash clash2 sing-box-template; do
+    TPL_FILE="${TEMP_DIR}/${TPL_NAME}"
+    [ -s "$TPL_FILE" ] && continue
+    if [ "$TPL_NAME" = 'sing-box-template' ]; then
+      TPL_URL='sing-box'
+    else
+      TPL_URL="$TPL_NAME"
+    fi
+    TPL_PART="${TPL_FILE}.part"
+    rm -f "$TPL_PART"
+    if wget --no-check-certificate --continue --tries=2 --timeout=10 -qO "$TPL_PART" "${GH_PROXY}${SUBSCRIBE_TEMPLATE}/${TPL_URL}" 2>/dev/null && [ -s "$TPL_PART" ]; then
+      mv -f "$TPL_PART" "$TPL_FILE"
+    else
+      rm -f "$TPL_PART"
+      MISSING=true
+    fi
+  done
+  [ "$MISSING" != 'true' ]
 }
 
 export_list() {
   IS_INSTALL=$1
 
-  check_install
+  # 状态由入口调用方检测一次；仅在调用方未初始化状态时兜底。
+  if [ "$IS_INSTALL" != 'dynamic_template' ] && { [ -z "${STATUS[0]+x}" ] || [ -z "${STATUS[1]+x}" ]; }; then
+    check_install
+  fi
+
+  ensure_subscription_templates || {
+    warning " $(text 215) "
+    return 1
+  }
 
   [ "$IS_INSTALL" != 'install' ] && fetch_nodes_value
 
+<<<<<<< HEAD
   # 动态订阅开启时刷新固定隧道域名与公网地址元数据，确保 Argo 域名变更、
   # Token/YAML 模式差异以及 WAN 地址变化无需反复开关动态订阅。
   if [ "$IS_INSTALL" != 'dynamic_template' ] && dynamic_sub_enabled; then
     dynamic_meta_write
   fi
 
+=======
+>>>>>>> upstream/main
   # 动态模板模式（IS_INSTALL=dynamic_template）：复用整套渲染逻辑，但把三件套
   # 替换成占位符、输出目录指向只读模板目录，绝不触碰 ${WORK_DIR}/subscribe/* 与 list。
   # 直连节点统一引用 SERVER_IP 系列；WS/CDN/Argo 用独立变量，天然不受影响。
@@ -5992,6 +6488,7 @@ export_list() {
     SUB_TPL_SRC="$DYNAMIC_TEMPLATE_DIR/src"
     mkdir -p "$SUB_OUT_DIR" "$SUB_TPL_SRC"
 <<<<<<< HEAD
+<<<<<<< HEAD
     # 模板源独立下载/复用，不依赖 TEMP_DIR，保证静态路径零副作用
     for TPL_NAME in clash clash2 sing-box-template; do
       [ -s "${SUB_TPL_SRC}/${TPL_NAME}" ] || wget --no-check-certificate --continue --tries=2 --timeout=10 -qO "${SUB_TPL_SRC}/${TPL_NAME}" "${GH_PROXY}${SUBSCRIBE_TEMPLATE}/$( [ "$TPL_NAME" = 'sing-box-template' ] && echo sing-box || echo $TPL_NAME )" 2>/dev/null
@@ -6002,11 +6499,18 @@ export_list() {
     wait 2>/dev/null
     for TPL_NAME in clash clash2 sing-box-template; do
       [ -s "${SUB_TPL_SRC}/${TPL_NAME}" ] && continue
+=======
+    # 模板源优先复用 ensure_subscription_templates() 已准备到 TEMP_DIR 的文件。
+    for TPL_NAME in clash clash2 sing-box-template; do
+>>>>>>> upstream/main
       if [ -s "${TEMP_DIR}/${TPL_NAME}" ]; then
         cp "${TEMP_DIR}/${TPL_NAME}" "${SUB_TPL_SRC}/${TPL_NAME}"
       else
         wget --no-check-certificate --continue --tries=2 --timeout=10 -qO "${SUB_TPL_SRC}/${TPL_NAME}" "${GH_PROXY}${SUBSCRIBE_TEMPLATE}/$( [ "$TPL_NAME" = 'sing-box-template' ] && echo sing-box || echo $TPL_NAME )" 2>/dev/null
       fi
+<<<<<<< HEAD
+>>>>>>> upstream/main
+=======
 >>>>>>> upstream/main
     done
   else
@@ -6022,7 +6526,12 @@ export_list() {
   fi
 
   # 使用 Argo 时，获取临时隧道域名
-  ls ${WORK_DIR}/conf/*-ws*inbounds.json >/dev/null 2>&1 && [ "$IS_ARGO" = 'is_argo' ] && [ -z "$ARGO_DOMAIN" ] && [[ "${STATUS[1]}" = "$(text 28)" || "$NONINTERACTIVE_INSTALL" = 'noninteractive_install' ]] && fetch_quicktunnel_domain
+  [ "$IS_INSTALL" != 'dynamic_template' ] && ls ${WORK_DIR}/conf/*-ws*inbounds.json >/dev/null 2>&1 && [ "$IS_ARGO" = 'is_argo' ] && [ -z "$ARGO_DOMAIN" ] && ensure_quicktunnel_domain
+
+  # 临时 Argo 域名可能刚在上方获取，刷新元数据后本次输出即可包含隧道地址。
+  if [ "$IS_INSTALL" != 'dynamic_template' ] && dynamic_sub_enabled; then
+    dynamic_meta_write
+  fi
 
   # 如果使用 Json 或者 Token Argo，则使用加密的而且是固定的 Argo 隧道域名，否则使用 IP:PORT 的 http 服务
   [[ "$ARGO_TYPE" = 'is_token_argo' || "$ARGO_TYPE" = 'is_json_argo' ]] && SUBSCRIBE_ADDRESS="https://$ARGO_DOMAIN" || SUBSCRIBE_ADDRESS="http://${SERVER_IP_1}:${PORT_NGINX}"
@@ -6107,10 +6616,10 @@ export_list() {
   $CLASH_TROJAN
 "
   if [ -n "$PORT_VMESS_WS" ]; then
-    local VMESS_CDN_PORT=${CDN_PORT[17]:-80}
+    local VMESS_CDN_PORT=${CDN_PORT[17]:-443}
     local VMESS_CDN_SERVER=$(format_uri_host "${CDN[17]}")
-    if [[ "${STATUS[1]}" =~ $(text 27)|$(text 28) ]] || [[ "$IS_ARGO" = 'is_argo' && "$NONINTERACTIVE_INSTALL" = 'noninteractive_install' ]]; then
-      local CLASH_VMESS_WS="- {name: \"${NODE_NAME[17]} ${NODE_TAG[6]}\", type: vmess, server: ${VMESS_CDN_SERVER}, port: ${VMESS_CDN_PORT}, uuid: ${UUID[17]}, udp: true, tls: false, alterId: 0, cipher: aes-128-gcm, network: ws, ws-opts: { path: \"/$VMESS_WS_PATH\", headers: {Host: $ARGO_DOMAIN} }, smux: { enabled: true, protocol: 'h2mux', padding: true, max-connections: '8', min-streams: '16', statistic: true, only-tcp: false }, brutal-opts: { enabled: ${IS_BRUTAL}, up: '1000 Mbps', down: '1000 Mbps' } }" &&
+    if [ "$IS_ARGO" = 'is_argo' ]; then
+      local CLASH_VMESS_WS="- {name: \"${NODE_NAME[17]} ${NODE_TAG[6]}\", type: vmess, server: ${VMESS_CDN_SERVER}, port: ${VMESS_CDN_PORT}, uuid: ${UUID[17]}, udp: true, tls: true, servername: $ARGO_DOMAIN, alterId: 0, cipher: aes-128-gcm, network: ws, ws-opts: { path: \"/$VMESS_WS_PATH\", headers: {Host: $ARGO_DOMAIN} }, smux: { enabled: true, protocol: 'h2mux', padding: true, max-connections: '8', min-streams: '16', statistic: true, only-tcp: false }, brutal-opts: { enabled: ${IS_BRUTAL}, up: '1000 Mbps', down: '1000 Mbps' } }" &&
       local CLASH_SUBSCRIBE+="
   $CLASH_VMESS_WS
 "
@@ -6118,7 +6627,7 @@ export_list() {
   # $(text 94)
 "
     else
-      local CLASH_VMESS_WS="- {name: \"${NODE_NAME[17]} ${NODE_TAG[6]}\", type: vmess, server: ${VMESS_CDN_SERVER}, port: ${VMESS_CDN_PORT}, uuid: ${UUID[17]}, udp: true, tls: false, alterId: 0, cipher: aes-128-gcm, network: ws, ws-opts: { path: \"/$VMESS_WS_PATH\", headers: {Host: $VMESS_HOST_DOMAIN} }, smux: { enabled: true, protocol: 'h2mux', padding: true, max-connections: '8', min-streams: '16', statistic: true, only-tcp: false }, brutal-opts: { enabled: ${IS_BRUTAL}, up: '1000 Mbps', down: '1000 Mbps' } }" &&
+      local CLASH_VMESS_WS="- {name: \"${NODE_NAME[17]} ${NODE_TAG[6]}\", type: vmess, server: ${VMESS_CDN_SERVER}, port: ${VMESS_CDN_PORT}, uuid: ${UUID[17]}, udp: true, tls: true, servername: $VMESS_HOST_DOMAIN, alterId: 0, cipher: aes-128-gcm, network: ws, ws-opts: { path: \"/$VMESS_WS_PATH\", headers: {Host: $VMESS_HOST_DOMAIN} }, smux: { enabled: true, protocol: 'h2mux', padding: true, max-connections: '8', min-streams: '16', statistic: true, only-tcp: false }, brutal-opts: { enabled: ${IS_BRUTAL}, up: '1000 Mbps', down: '1000 Mbps' } }" &&
       local WS_SERVER_IP_SHOW=${WS_SERVER_IP[17]} && local TYPE_HOST_DOMAIN=$VMESS_HOST_DOMAIN && local TYPE_PORT_WS=$PORT_VMESS_WS &&
       local CLASH_SUBSCRIBE+="
   $CLASH_VMESS_WS
@@ -6131,7 +6640,7 @@ export_list() {
   if [ -n "$PORT_VLESS_WS" ]; then
     local VLESS_CDN_PORT=${CDN_PORT[18]:-443}
     local VLESS_CDN_SERVER=$(format_uri_host "${CDN[18]}")
-     if [[ "${STATUS[1]}" =~ $(text 27)|$(text 28) ]] || [[ "$IS_ARGO" = 'is_argo' && "$NONINTERACTIVE_INSTALL" = 'noninteractive_install' ]]; then
+     if [ "$IS_ARGO" = 'is_argo' ]; then
       local CLASH_VLESS_WS="- {name: \"${NODE_NAME[18]} ${NODE_TAG[7]}\", type: vless, server: ${VLESS_CDN_SERVER}, port: ${VLESS_CDN_PORT}, uuid: ${UUID[18]}, udp: true, tls: true, servername: $ARGO_DOMAIN, network: ws, skip-cert-verify: false, ws-opts: { path: \"/$VLESS_WS_PATH\", headers: {Host: $ARGO_DOMAIN}, max-early-data: 2560, early-data-header-name: Sec-WebSocket-Protocol }, smux: { enabled: true, protocol: 'h2mux', padding: true, max-connections: '8', min-streams: '16', statistic: true, only-tcp: false }, brutal-opts: { enabled: ${IS_BRUTAL}, up: '1000 Mbps', down: '1000 Mbps' } }" &&
       local CLASH_SUBSCRIBE+="
   $CLASH_VLESS_WS
@@ -6182,14 +6691,49 @@ export_list() {
     CLASH2_PROXY_INSERT=("$CLASH_XTLS_REALITY" "$CLASH_HYSTERIA2" "$CLASH_TUIC" "$CLASH_SHADOWTLS" "$CLASH_SHADOWSOCKS" "$CLASH_TROJAN" "$CLASH_VMESS_WS" "$CLASH_VLESS_WS" "$CLASH_GRPC_REALITY" "$CLASH_ANYTLS" "$CLASH_SNELL")
     CLASH2_PROXY_GROUPS_INSERT=("- ${NODE_NAME[11]} ${NODE_TAG[0]}" "- ${NODE_NAME[12]} ${NODE_TAG[1]}" "- ${NODE_NAME[13]} ${NODE_TAG[2]}" "- ${NODE_NAME[14]} ${NODE_TAG[3]}" "- ${NODE_NAME[15]} ${NODE_TAG[4]}" "- ${NODE_NAME[16]} ${NODE_TAG[5]}" "- ${NODE_NAME[17]} ${NODE_TAG[6]}" "- ${NODE_NAME[18]} ${NODE_TAG[7]}" "- ${NODE_NAME[20]} ${NODE_TAG[9]}" "- ${NODE_NAME[21]} ${NODE_TAG[10]}" "- ${NODE_NAME[23]} ${NODE_TAG[12]}")
 
+<<<<<<< HEAD
     CLASH2_YAML=$(cat ${SUB_TPL_SRC}/clash2)
+=======
+    # clash2 模板较大，旧实现按节点反复执行 sed，会对整文件扫描二十多次。
+    # 先收集插入项，再用 awk 单次扫描完成所有插入。
+    CLASH2_PROXY_INSERT_FILE="${TEMP_DIR}/clash2_proxy_insert"
+    CLASH2_GROUP_INSERT_FILE="${TEMP_DIR}/clash2_group_insert"
+    : > "$CLASH2_PROXY_INSERT_FILE"
+    : > "$CLASH2_GROUP_INSERT_FILE"
+>>>>>>> upstream/main
     for x in ${!CLASH2_PORT[@]}; do
-      [[ ${CLASH2_PORT[x]} =~ [0-9]+ ]] && { CLASH2_YAML=$(sed "/proxy-groups:/i\  ${CLASH2_PROXY_INSERT[x]}" <<< "$CLASH2_YAML"); CLASH2_YAML=$(sed -E "/- name: (♻️ 自动选择|📲 电报消息|💬 OpenAi|📹 油管视频|🎥 奈飞视频|📺 巴哈姆特|📺 哔哩哔哩|🌍 国外媒体|🌏 国内媒体|📢 谷歌FCM|Ⓜ️ 微软Bing|Ⓜ️ 微软云盘|Ⓜ️ 微软服务|🍎 苹果服务|🎮 游戏平台|🎶 网易音乐|🎯 全球直连)|^rules:$/i\      ${CLASH2_PROXY_GROUPS_INSERT[x]}" <<< "$CLASH2_YAML"); }
+      if [[ ${CLASH2_PORT[x]} =~ [0-9]+ ]]; then
+        printf '  %s\n' "${CLASH2_PROXY_INSERT[x]}" >> "$CLASH2_PROXY_INSERT_FILE"
+        printf '      %s\n' "${CLASH2_PROXY_GROUPS_INSERT[x]}" >> "$CLASH2_GROUP_INSERT_FILE"
+      fi
     done
+<<<<<<< HEAD
     echo "$CLASH2_YAML" > ${SUB_OUT_DIR}/clash2
 
     [ "$IS_INSTALL" != 'dynamic_template' ] && rm -f ${TEMP_DIR}/clash{,2}
   } &>/dev/null
+=======
+    awk -v proxy_file="$CLASH2_PROXY_INSERT_FILE" -v group_file="$CLASH2_GROUP_INSERT_FILE" '
+      BEGIN {
+        while ((getline line < proxy_file) > 0) proxy[++proxy_count] = line
+        close(proxy_file)
+        while ((getline line < group_file) > 0) group[++group_count] = line
+        close(group_file)
+      }
+      {
+        if ($0 ~ /proxy-groups:/) {
+          for (i = 1; i <= proxy_count; i++) print proxy[i]
+        }
+        if ($0 ~ /- name: (♻️ 自动选择|📲 电报消息|💬 OpenAi|📹 油管视频|🎥 奈飞视频|📺 巴哈姆特|📺 哔哩哔哩|🌍 国外媒体|🌏 国内媒体|📢 谷歌FCM|Ⓜ️ 微软Bing|Ⓜ️ 微软云盘|Ⓜ️ 微软服务|🍎 苹果服务|🎮 游戏平台|🎶 网易音乐|🎯 国内直连)|^rules:$/) {
+          for (i = 1; i <= group_count; i++) print group[i]
+        }
+        print
+      }
+    ' "${SUB_TPL_SRC}/clash2" > "${SUB_OUT_DIR}/clash2"
+    rm -f "$CLASH2_PROXY_INSERT_FILE" "$CLASH2_GROUP_INSERT_FILE"
+
+  } >/dev/null
+>>>>>>> upstream/main
 
   # 生成 ShadowRocket 订阅配置文件
   [ -n "$PORT_XTLS_REALITY" ] && local SHADOWROCKET_SUBSCRIBE+="
@@ -6216,12 +6760,12 @@ ss://$(echo -n "${SHADOWSOCKS_METHOD}:${SHADOWSOCKS_PASSWORD}@${SERVER_IP_2}:$PO
 trojan://${TROJAN_PASSWORD}@${SERVER_IP_1}:$PORT_TROJAN?peer=${TLS_SERVER}&hpkp=${SELF_SIGNED_FINGERPRINT_SHA256}#${NODE_NAME[16]// /%20}%20${NODE_TAG[5]}
 "
   if [ -n "$PORT_VMESS_WS" ]; then
-    local VMESS_CDN_PORT=${CDN_PORT[17]:-80}
+    local VMESS_CDN_PORT=${CDN_PORT[17]:-443}
     local VMESS_CDN_HOST=$(format_uri_host "${CDN[17]}")
-     if [[ "${STATUS[1]}" =~ $(text 27)|$(text 28) ]] || [[ "$IS_ARGO" = 'is_argo' && "$NONINTERACTIVE_INSTALL" = 'noninteractive_install' ]]; then
+     if [ "$IS_ARGO" = 'is_argo' ]; then
       local SHADOWROCKET_SUBSCRIBE+="
 ----------------------------
-vmess://$(echo -n "aes-128-gcm:${UUID[17]}@${VMESS_CDN_HOST}:${VMESS_CDN_PORT}" | base64 -w0)?remarks=${NODE_NAME[17]// /%20}%20${NODE_TAG[6]}&obfsParam=$ARGO_DOMAIN&path=/$VMESS_WS_PATH&obfs=websocket&alterId=0
+vmess://$(echo -n "aes-128-gcm:${UUID[17]}@${VMESS_CDN_HOST}:${VMESS_CDN_PORT}" | base64 -w0)?remarks=${NODE_NAME[17]// /%20}%20${NODE_TAG[6]}&obfsParam=$ARGO_DOMAIN&path=/$VMESS_WS_PATH&obfs=websocket&alterId=0&tls=1&sni=${ARGO_DOMAIN}&allowInsecure=0
 "
       [ "$ARGO_TYPE" = 'is_token_argo' ] && SHADOWROCKET_SUBSCRIBE+="
   # $(text 94)
@@ -6229,7 +6773,7 @@ vmess://$(echo -n "aes-128-gcm:${UUID[17]}@${VMESS_CDN_HOST}:${VMESS_CDN_PORT}" 
     else
       WS_SERVER_IP_SHOW=${WS_SERVER_IP[17]} && TYPE_HOST_DOMAIN=$VMESS_HOST_DOMAIN && TYPE_PORT_WS=$PORT_VMESS_WS && local SHADOWROCKET_SUBSCRIBE+="
 ----------------------------
-vmess://$(echo -n "aes-128-gcm:${UUID[17]}@${VMESS_CDN_HOST}:${VMESS_CDN_PORT}" | base64 -w0)?remarks=${NODE_NAME[17]// /%20}%20${NODE_TAG[6]}&obfsParam=$VMESS_HOST_DOMAIN&path=/$VMESS_WS_PATH&obfs=websocket&alterId=0
+vmess://$(echo -n "aes-128-gcm:${UUID[17]}@${VMESS_CDN_HOST}:${VMESS_CDN_PORT}" | base64 -w0)?remarks=${NODE_NAME[17]// /%20}%20${NODE_TAG[6]}&obfsParam=$VMESS_HOST_DOMAIN&path=/$VMESS_WS_PATH&obfs=websocket&alterId=0&tls=1&sni=${VMESS_HOST_DOMAIN}&allowInsecure=0
 
 # $(text 52)
 "
@@ -6239,7 +6783,7 @@ vmess://$(echo -n "aes-128-gcm:${UUID[17]}@${VMESS_CDN_HOST}:${VMESS_CDN_PORT}" 
   if [ -n "$PORT_VLESS_WS" ]; then
     local VLESS_CDN_PORT=${CDN_PORT[18]:-443}
     local VLESS_CDN_HOST=$(format_uri_host "${CDN[18]}")
-     if [[ "${STATUS[1]}" =~ $(text 27)|$(text 28) ]] || [[ "$IS_ARGO" = 'is_argo' && "$NONINTERACTIVE_INSTALL" = 'noninteractive_install' ]]; then
+     if [ "$IS_ARGO" = 'is_argo' ]; then
       local SHADOWROCKET_SUBSCRIBE+="
 ----------------------------
 vless://$(echo -n "auto:${UUID[18]}@${VLESS_CDN_HOST}:${VLESS_CDN_PORT}" | base64 -w0)?remarks=${NODE_NAME[18]// /%20}%20${NODE_TAG[7]}&obfsParam=$ARGO_DOMAIN&path=/$VLESS_WS_PATH?ed=2560&obfs=websocket&tls=1&peer=$ARGO_DOMAIN
@@ -6313,12 +6857,12 @@ ss://$(echo -n "${SHADOWSOCKS_METHOD}:${SHADOWSOCKS_PASSWORD}@${SERVER_IP_1}:$PO
 v2rayn://trojan/$(echo -n "{\"ConfigType\":6,\"ConfigVersion\":4,\"Remarks\":\"${NODE_NAME[16]} ${NODE_TAG[5]}\",\"Address\":\"${SERVER_IP}\",\"Port\":${PORT_TROJAN},\"Password\":\"${TROJAN_PASSWORD}\",\"Network\":\"raw\",\"StreamSecurity\":\"tls\",\"AllowInsecure\":\"false\",\"Sni\":\"${TLS_SERVER}\",\"Cert\":\"${CERT_URL_2}\"}" | base64 -w0 | tr '+/' '-_' | tr -d '=')"
 
  if [ -n "$PORT_VMESS_WS" ]; then
-    local VMESS_CDN_PORT=${CDN_PORT[17]:-80}
+    local VMESS_CDN_PORT=${CDN_PORT[17]:-443}
     local VMESS_CDN_HOST=$(format_uri_host "${CDN[17]}")
-     if [[ "${STATUS[1]}" =~ $(text 27)|$(text 28) ]] || [[ "$IS_ARGO" = 'is_argo' && "$NONINTERACTIVE_INSTALL" = 'noninteractive_install' ]]; then
+     if [ "$IS_ARGO" = 'is_argo' ]; then
       local V2RAYN_SUBSCRIBE+="
 ----------------------------
-vmess://$(echo -n "{ \"v\": \"2\", \"ps\": \"${NODE_NAME[17]} ${NODE_TAG[6]}\", \"add\": \"${VMESS_CDN_HOST}\", \"port\": \"${VMESS_CDN_PORT}\", \"id\": \"${UUID[17]}\", \"aid\": \"0\", \"scy\": \"aes-128-gcm\", \"net\": \"ws\", \"type\": \"auto\", \"host\": \"$ARGO_DOMAIN\", \"path\": \"/$VMESS_WS_PATH\", \"tls\": \"\", \"sni\": \"\", \"alpn\": \"\" }" | base64 -w0)"
+vmess://$(echo -n "{ \"v\": \"2\", \"ps\": \"${NODE_NAME[17]} ${NODE_TAG[6]}\", \"add\": \"${VMESS_CDN_HOST}\", \"port\": \"${VMESS_CDN_PORT}\", \"id\": \"${UUID[17]}\", \"aid\": \"0\", \"scy\": \"aes-128-gcm\", \"net\": \"ws\", \"type\": \"auto\", \"host\": \"$ARGO_DOMAIN\", \"path\": \"/$VMESS_WS_PATH\", \"tls\": \"tls\", \"sni\": \"$ARGO_DOMAIN\", \"alpn\": \"\" }" | base64 -w0)"
       [ "$ARGO_TYPE" = 'is_token_argo' ] && V2RAYN_SUBSCRIBE+="
 
   # $(text 94)
@@ -6326,7 +6870,7 @@ vmess://$(echo -n "{ \"v\": \"2\", \"ps\": \"${NODE_NAME[17]} ${NODE_TAG[6]}\", 
     else
       WS_SERVER_IP_SHOW=${WS_SERVER_IP[17]} && TYPE_HOST_DOMAIN=$VMESS_HOST_DOMAIN && TYPE_PORT_WS=$PORT_VMESS_WS && local V2RAYN_SUBSCRIBE+="
 ----------------------------
-vmess://$(echo -n "{ \"v\": \"2\", \"ps\": \"${NODE_NAME[17]} ${NODE_TAG[6]}\", \"add\": \"${VMESS_CDN_HOST}\", \"port\": \"${VMESS_CDN_PORT}\", \"id\": \"${UUID[17]}\", \"aid\": \"0\", \"scy\": \"aes-128-gcm\", \"net\": \"ws\", \"type\": \"auto\", \"host\": \"$VMESS_HOST_DOMAIN\", \"path\": \"/$VMESS_WS_PATH\", \"tls\": \"\", \"sni\": \"\", \"alpn\": \"\" }" | base64 -w0)
+vmess://$(echo -n "{ \"v\": \"2\", \"ps\": \"${NODE_NAME[17]} ${NODE_TAG[6]}\", \"add\": \"${VMESS_CDN_HOST}\", \"port\": \"${VMESS_CDN_PORT}\", \"id\": \"${UUID[17]}\", \"aid\": \"0\", \"scy\": \"aes-128-gcm\", \"net\": \"ws\", \"type\": \"auto\", \"host\": \"$VMESS_HOST_DOMAIN\", \"path\": \"/$VMESS_WS_PATH\", \"tls\": \"tls\", \"sni\": \"$VMESS_HOST_DOMAIN\", \"alpn\": \"\" }" | base64 -w0)
 
 # $(text 52)"
     fi
@@ -6335,7 +6879,7 @@ vmess://$(echo -n "{ \"v\": \"2\", \"ps\": \"${NODE_NAME[17]} ${NODE_TAG[6]}\", 
   if [ -n "$PORT_VLESS_WS" ]; then
     local VLESS_CDN_PORT=${CDN_PORT[18]:-443}
     local VLESS_CDN_HOST=$(format_uri_host "${CDN[18]}")
-     if [[ "${STATUS[1]}" =~ $(text 27)|$(text 28) ]] || [[ "$IS_ARGO" = 'is_argo' && "$NONINTERACTIVE_INSTALL" = 'noninteractive_install' ]]; then
+     if [ "$IS_ARGO" = 'is_argo' ]; then
       local V2RAYN_SUBSCRIBE+="
 ----------------------------
 vless://${UUID[18]}@${VLESS_CDN_HOST}:${VLESS_CDN_PORT}?encryption=none&security=tls&sni=$ARGO_DOMAIN&type=ws&host=$ARGO_DOMAIN&path=%2F$VLESS_WS_PATH%3Fed%3D2560#${NODE_NAME[18]// /%20}%20${NODE_TAG[7]}"
@@ -6411,10 +6955,11 @@ ss://$(echo -n "${SHADOWSOCKS_METHOD}:${SHADOWSOCKS_PASSWORD}" | base64 -w0)@${S
 trojan://${TROJAN_PASSWORD}@${SERVER_IP_1}:$PORT_TROJAN?security=tls&sni=${TLS_SERVER}&allowInsecure=0&tls_certificate=${CERT_URL_1}&fp=${FINGER_PRINT}&type=tcp#${NODE_NAME[16]// /%20}%20${NODE_TAG[5]}"
 
   if [ -n "$PORT_VMESS_WS" ]; then
-     if [[ "${STATUS[1]}" =~ $(text 27)|$(text 28) ]] || [[ "$IS_ARGO" = 'is_argo' && "$NONINTERACTIVE_INSTALL" = 'noninteractive_install' ]]; then
+    local VMESS_CDN_PORT=${CDN_PORT[17]:-443}
+     if [ "$IS_ARGO" = 'is_argo' ]; then
       THRONE_SUBSCRIBE+="
 ----------------------------
-vmess://$(echo -n "{\"add\":\"${CDN[17]}\",\"aid\":\"0\",\"host\":\"$ARGO_DOMAIN\",\"id\":\"${UUID[17]}\",\"net\":\"ws\",\"path\":\"/$VMESS_WS_PATH\",\"port\":\"80\",\"ps\":\"${NODE_NAME[17]} ${NODE_TAG[6]}\",\"scy\":\"aes-128-gcm\",\"sni\":\"\",\"tls\":\"\",\"type\":\"\",\"v\":\"2\"}" | base64 -w0)"
+vmess://$(echo -n "{\"add\":\"${CDN[17]}\",\"aid\":\"0\",\"host\":\"$ARGO_DOMAIN\",\"id\":\"${UUID[17]}\",\"net\":\"ws\",\"path\":\"/$VMESS_WS_PATH\",\"port\":\"${VMESS_CDN_PORT}\",\"ps\":\"${NODE_NAME[17]} ${NODE_TAG[6]}\",\"scy\":\"aes-128-gcm\",\"sni\":\"$ARGO_DOMAIN\",\"tls\":\"tls\",\"type\":\"\",\"v\":\"2\"}" | base64 -w0)"
       [ "$ARGO_TYPE" = 'is_token_argo' ] && THRONE_SUBSCRIBE+="
 
   # $(text 94)
@@ -6422,7 +6967,7 @@ vmess://$(echo -n "{\"add\":\"${CDN[17]}\",\"aid\":\"0\",\"host\":\"$ARGO_DOMAIN
     else
       WS_SERVER_IP_SHOW=${WS_SERVER_IP[17]} && TYPE_HOST_DOMAIN=$VMESS_HOST_DOMAIN && TYPE_PORT_WS=$PORT_VMESS_WS && local THRONE_SUBSCRIBE+="
 ----------------------------
-vmess://$(echo -n "{\"add\":\"${CDN[17]}\",\"aid\":\"0\",\"host\":\"$VMESS_HOST_DOMAIN\",\"id\":\"${UUID[17]}\",\"net\":\"ws\",\"path\":\"/$VMESS_WS_PATH\",\"port\":\"80\",\"ps\":\"${NODE_NAME[17]} ${NODE_TAG[6]}\",\"scy\":\"aes-128-gcm\",\"sni\":\"\",\"tls\":\"\",\"type\":\"\",\"v\":\"2\"}" | base64 -w0)
+vmess://$(echo -n "{\"add\":\"${CDN[17]}\",\"aid\":\"0\",\"host\":\"$VMESS_HOST_DOMAIN\",\"id\":\"${UUID[17]}\",\"net\":\"ws\",\"path\":\"/$VMESS_WS_PATH\",\"port\":\"${VMESS_CDN_PORT}\",\"ps\":\"${NODE_NAME[17]} ${NODE_TAG[6]}\",\"scy\":\"aes-128-gcm\",\"sni\":\"$VMESS_HOST_DOMAIN\",\"tls\":\"tls\",\"type\":\"\",\"v\":\"2\"}" | base64 -w0)
 
 # $(text 52)"
     fi
@@ -6431,7 +6976,7 @@ vmess://$(echo -n "{\"add\":\"${CDN[17]}\",\"aid\":\"0\",\"host\":\"$VMESS_HOST_
   if [ -n "$PORT_VLESS_WS" ]; then
     local VLESS_CDN_PORT=${CDN_PORT[18]:-443}
     local VLESS_CDN_HOST=$(format_uri_host "${CDN[18]}")
-     if [[ "${STATUS[1]}" =~ $(text 27)|$(text 28) ]] || [[ "$IS_ARGO" = 'is_argo' && "$NONINTERACTIVE_INSTALL" = 'noninteractive_install' ]]; then
+     if [ "$IS_ARGO" = 'is_argo' ]; then
       local THRONE_SUBSCRIBE+="
 ----------------------------
 vless://${UUID[18]}@${VLESS_CDN_HOST}:${VLESS_CDN_PORT}?security=tls&sni=$ARGO_DOMAIN&type=ws&path=/$VLESS_WS_PATH?ed%3D2560&host=$ARGO_DOMAIN&encryption=none#${NODE_NAME[18]// /%20}%20${NODE_TAG[7]}"
@@ -6514,10 +7059,10 @@ snell://${UUID[23]}@${SERVER_IP_1}:${PORT_SNELL}?version=6&mode=default&reuse=1#
   local NODE_REPLACE+="\"${NODE_NAME[16]} ${NODE_TAG[5]}\","
 
   if [ -n "$PORT_VMESS_WS" ]; then
-    local VMESS_CDN_PORT=${CDN_PORT[17]:-80}
+    local VMESS_CDN_PORT=${CDN_PORT[17]:-443}
     local VMESS_CDN_HOST=$(format_uri_host "${CDN[17]}")
-     if [[ "${STATUS[1]}" =~ $(text 27)|$(text 28) ]] || [[ "$IS_ARGO" = 'is_argo' && "$NONINTERACTIVE_INSTALL" = 'noninteractive_install' ]]; then
-      local OUTBOUND_REPLACE+=" { \"type\": \"vmess\", \"tag\": \"${NODE_NAME[17]} ${NODE_TAG[6]}\", \"server\":\"${VMESS_CDN_HOST}\", \"server_port\":${VMESS_CDN_PORT}, \"uuid\": \"${UUID[17]}\", \"security\": \"aes-128-gcm\", \"transport\": { \"type\":\"ws\", \"path\":\"/$VMESS_WS_PATH\", \"headers\": { \"Host\": \"$ARGO_DOMAIN\" } }, \"multiplex\": { \"enabled\":true, \"protocol\":\"h2mux\", \"max_streams\":16, \"padding\": true, \"brutal\":{ \"enabled\":${IS_BRUTAL}, \"up_mbps\":1000, \"down_mbps\":1000 } } },"
+     if [ "$IS_ARGO" = 'is_argo' ]; then
+      local OUTBOUND_REPLACE+=" { \"type\": \"vmess\", \"tag\": \"${NODE_NAME[17]} ${NODE_TAG[6]}\", \"server\":\"${VMESS_CDN_HOST}\", \"server_port\":${VMESS_CDN_PORT}, \"uuid\": \"${UUID[17]}\", \"security\": \"aes-128-gcm\", \"tls\": { \"enabled\": true, \"server_name\": \"$ARGO_DOMAIN\", \"insecure\": false, \"utls\": { \"enabled\": true, \"fingerprint\": \"${FINGER_PRINT}\" } }, \"transport\": { \"type\":\"ws\", \"path\":\"/$VMESS_WS_PATH\", \"headers\": { \"Host\": \"$ARGO_DOMAIN\" } }, \"multiplex\": { \"enabled\":true, \"protocol\":\"h2mux\", \"max_streams\":16, \"padding\": true, \"brutal\":{ \"enabled\":${IS_BRUTAL}, \"up_mbps\":1000, \"down_mbps\":1000 } } },"
       [ "$ARGO_TYPE" = 'is_token_argo' ] && [ -z "$PROMPT" ] && local PROMPT="
   # $(text 94)"
     else
@@ -6526,7 +7071,7 @@ snell://${UUID[23]}@${SERVER_IP_1}:${PORT_SNELL}?version=6&mode=default&reuse=1#
       local TYPE_PORT_WS=$PORT_VMESS_WS &&
       local PROMPT+="
       # $(text 52)" &&
-      local OUTBOUND_REPLACE+=" { \"type\": \"vmess\", \"tag\": \"${NODE_NAME[17]} ${NODE_TAG[6]}\", \"server\":\"${VMESS_CDN_HOST}\", \"server_port\":${VMESS_CDN_PORT}, \"uuid\":\"${UUID[17]}\", \"security\": \"aes-128-gcm\", \"transport\": { \"type\":\"ws\", \"path\":\"/$VMESS_WS_PATH\", \"headers\": { \"Host\": \"$VMESS_HOST_DOMAIN\" } }, \"multiplex\": { \"enabled\":true, \"protocol\":\"h2mux\", \"max_streams\":16, \"padding\": true, \"brutal\":{ \"enabled\":${IS_BRUTAL}, \"up_mbps\":1000, \"down_mbps\":1000 } } },"
+      local OUTBOUND_REPLACE+=" { \"type\": \"vmess\", \"tag\": \"${NODE_NAME[17]} ${NODE_TAG[6]}\", \"server\":\"${VMESS_CDN_HOST}\", \"server_port\":${VMESS_CDN_PORT}, \"uuid\":\"${UUID[17]}\", \"security\": \"aes-128-gcm\", \"tls\": { \"enabled\": true, \"server_name\": \"$VMESS_HOST_DOMAIN\", \"insecure\": false, \"utls\": { \"enabled\": true, \"fingerprint\": \"${FINGER_PRINT}\" } }, \"transport\": { \"type\":\"ws\", \"path\":\"/$VMESS_WS_PATH\", \"headers\": { \"Host\": \"$VMESS_HOST_DOMAIN\" } }, \"multiplex\": { \"enabled\":true, \"protocol\":\"h2mux\", \"max_streams\":16, \"padding\": true, \"brutal\":{ \"enabled\":${IS_BRUTAL}, \"up_mbps\":1000, \"down_mbps\":1000 } } },"
     fi
     local NODE_REPLACE+="\"${NODE_NAME[17]} ${NODE_TAG[6]}\","
   fi
@@ -6534,7 +7079,7 @@ snell://${UUID[23]}@${SERVER_IP_1}:${PORT_SNELL}?version=6&mode=default&reuse=1#
   if [ -n "$PORT_VLESS_WS" ]; then
     local VLESS_CDN_PORT=${CDN_PORT[18]:-443}
     local VLESS_CDN_HOST=$(format_uri_host "${CDN[18]}")
-    if [[ "${STATUS[1]}" =~ $(text 27)|$(text 28) ]] || [[ "$IS_ARGO" = 'is_argo' && "$NONINTERACTIVE_INSTALL" = 'noninteractive_install' ]]; then
+    if [ "$IS_ARGO" = 'is_argo' ]; then
       local OUTBOUND_REPLACE+=" { \"type\": \"vless\", \"tag\": \"${NODE_NAME[18]} ${NODE_TAG[7]}\", \"server\":\"${VLESS_CDN_HOST}\", \"server_port\":${VLESS_CDN_PORT}, \"uuid\": \"${UUID[18]}\", \"tls\": { \"enabled\":true, \"server_name\":\"$ARGO_DOMAIN\", \"insecure\": false, \"utls\": { \"enabled\":true, \"fingerprint\":\"${FINGER_PRINT}\" } }, \"transport\": { \"type\":\"ws\", \"path\":\"/$VLESS_WS_PATH\", \"headers\": { \"Host\": \"$ARGO_DOMAIN\" }, \"max_early_data\":2560, \"early_data_header_name\":\"Sec-WebSocket-Protocol\" }, \"multiplex\": { \"enabled\":true, \"protocol\":\"h2mux\", \"max_streams\":16, \"padding\": true, \"brutal\":{ \"enabled\":${IS_BRUTAL}, \"up_mbps\":1000, \"down_mbps\":1000 } } },"
       [ "$ARGO_TYPE" = 'is_token_argo' ] && [ -z "$PROMPT" ] && local PROMPT="
   # $(text 94)"
@@ -6575,33 +7120,63 @@ snell://${UUID[23]}@${SERVER_IP_1}:${PORT_SNELL}?version=6&mode=default&reuse=1#
     # 生成 sing-box SFM SFA SFI 订阅文件
     [ ! -s "${SUB_TPL_SRC}/sing-box-template" ] && wget --no-check-certificate --continue --tries=2 --timeout=10 -qO "${SUB_TPL_SRC}/sing-box-template" "${GH_PROXY}${SUBSCRIBE_TEMPLATE}/sing-box" 2>/dev/null
     cat ${SUB_TPL_SRC}/sing-box-template | sed "s#\"<OUTBOUND_REPLACE>\",#$OUTBOUND_REPLACE#; s#\"<NODE_REPLACE>\"#${NODE_REPLACE%,}#g" | ${WORK_DIR}/jq > ${SUB_OUT_DIR}/sing-box
+<<<<<<< HEAD
     [ "$IS_INSTALL" != 'dynamic_template' ] && rm -f ${TEMP_DIR}/sing-box-template
   } &>/dev/null
 
   # 动态模板模式：7 种格式已写入模板目录，直接返回，绝不触碰 list / 统计 / 交互
   [ "$IS_INSTALL" = 'dynamic_template' ] && return 0
+=======
+  } >/dev/null
+
+  # 动态模板模式：7 种格式已写入模板目录，直接返回，绝不触碰 list / 统计 / 交互
+  [ "$IS_INSTALL" = 'dynamic_template' ] && { wait 2>/dev/null; return 0; }
+
+  # 动态订阅开启时，在“模版 1 / 模版 2”下直接按访问方式列出完整动态 URL。
+  # 关闭时保持原有单套静态地址输出。
+  local STATIC_AUTO_SUBSCRIBE_1="${SUBSCRIBE_ADDRESS}/${UUID_CONFIRM}/auto"
+  local STATIC_AUTO_SUBSCRIBE_2="${SUBSCRIBE_ADDRESS}/${UUID_CONFIRM}/auto2"
+  local AUTO_SUBSCRIBE_1="$STATIC_AUTO_SUBSCRIBE_1"
+  local AUTO_SUBSCRIBE_2="$STATIC_AUTO_SUBSCRIBE_2"
+  local QR_SUBSCRIBE_1="$STATIC_AUTO_SUBSCRIBE_1"
+  local QR_SUBSCRIBE_2="$STATIC_AUTO_SUBSCRIBE_2"
+  if dynamic_sub_enabled; then
+    local DYNAMIC_AUTO_1="$(dynamic_subscribe_output auto)"
+    local DYNAMIC_AUTO_2="$(dynamic_subscribe_output auto2)"
+    if [ -n "$DYNAMIC_AUTO_1" ]; then
+      AUTO_SUBSCRIBE_1="$DYNAMIC_AUTO_1"
+      QR_SUBSCRIBE_1="$(dynamic_first_subscribe_url auto)"
+      [ -z "$QR_SUBSCRIBE_1" ] && QR_SUBSCRIBE_1="$STATIC_AUTO_SUBSCRIBE_1"
+    fi
+    if [ -n "$DYNAMIC_AUTO_2" ]; then
+      AUTO_SUBSCRIBE_2="$DYNAMIC_AUTO_2"
+      QR_SUBSCRIBE_2="$(dynamic_first_subscribe_url auto2)"
+      [ -z "$QR_SUBSCRIBE_2" ] && QR_SUBSCRIBE_2="$STATIC_AUTO_SUBSCRIBE_2"
+    fi
+  fi
+>>>>>>> upstream/main
 
   # 生成二维码 url 文件（动态模板模式跳过，避免写 subscribe/qr）
   [ "$IS_SUB" = 'is_sub' ] && [ "$IS_INSTALL" != 'dynamic_template' ] && cat > ${WORK_DIR}/subscribe/qr << EOF
 $(text 81):
 $(text 82) 1:
-$SUBSCRIBE_ADDRESS/${UUID_CONFIRM}/auto
+$AUTO_SUBSCRIBE_1
 
 $(text 82) 2:
-$SUBSCRIBE_ADDRESS/${UUID_CONFIRM}/auto2
+$AUTO_SUBSCRIBE_2
 
 $(text 80) QRcode:
 $(text 82) 1:
-https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=$SUBSCRIBE_ADDRESS/${UUID_CONFIRM}/auto
+https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=$QR_SUBSCRIBE_1
 
 $(text 82) 2:
-https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=$SUBSCRIBE_ADDRESS/${UUID_CONFIRM}/auto2
+https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=$QR_SUBSCRIBE_2
 
 $(text 82) 1:
-$(${WORK_DIR}/qrencode "$SUBSCRIBE_ADDRESS/${UUID_CONFIRM}/auto")
+$(${WORK_DIR}/qrencode "$QR_SUBSCRIBE_1")
 
 $(text 82) 2:
-$(${WORK_DIR}/qrencode "$SUBSCRIBE_ADDRESS/${UUID_CONFIRM}/auto2")
+$(${WORK_DIR}/qrencode "$QR_SUBSCRIBE_2")
 EOF
 
   # 动态订阅开启时，在“模版 1 / 模版 2”下直接按访问方式列出完整动态 URL。
@@ -6703,26 +7278,27 @@ $AUTO_SUBSCRIBE_2
 
  $(text 80) QRcode:
 $(text 82) 1:
-https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=$SUBSCRIBE_ADDRESS/${UUID_CONFIRM}/auto
+https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=$QR_SUBSCRIBE_1
 
 $(text 82) 2:
-https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=$SUBSCRIBE_ADDRESS/${UUID_CONFIRM}/auto2")
+https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=$QR_SUBSCRIBE_2")
 
 $(hint "$(text 82) 1:")
-$(${WORK_DIR}/qrencode $SUBSCRIBE_ADDRESS/${UUID_CONFIRM}/auto)
+$(${WORK_DIR}/qrencode "$QR_SUBSCRIBE_1")
 
 $(hint "$(text 82) 2:")
-$(${WORK_DIR}/qrencode $SUBSCRIBE_ADDRESS/${UUID_CONFIRM}/auto2)
+$(${WORK_DIR}/qrencode "$QR_SUBSCRIBE_2")
 "
 
-  # === 流量统计块（仅 clash_api 可用时显示；流量为 0 时显示 0 B） ===
-  # downloadTotal / uploadTotal 为 clash_api 提供的进程生命周期累计值
-  STATS_JSON=''   # 每次调用 export_list 都是独立的用户请求，强制刷新获取实时数据
-  if ensure_stats_data; then
-    local IN_SUM OUT_SUM
-    IN_SUM=$(echo "$STATS_JSON" | $WORK_DIR/jq '.downloadTotal // 0' 2>/dev/null)
-    OUT_SUM=$(echo "$STATS_JSON" | $WORK_DIR/jq '.uploadTotal // 0' 2>/dev/null)
-    EXPORT_LIST_FILE="${EXPORT_LIST_FILE}
+  if [ "$IS_INSTALL" != 'dynamic_template' ]; then
+    # === 流量统计块（仅 clash_api 可用时显示；流量为 0 时显示 0 B） ===
+    # downloadTotal / uploadTotal 为 clash_api 提供的进程生命周期累计值
+    STATS_JSON=''   # 每次调用 export_list 都是独立的用户请求，强制刷新获取实时数据
+    if ensure_stats_data; then
+      local IN_SUM OUT_SUM
+      IN_SUM=$(echo "$STATS_JSON" | $WORK_DIR/jq '.downloadTotal // 0' 2>/dev/null)
+      OUT_SUM=$(echo "$STATS_JSON" | $WORK_DIR/jq '.uploadTotal // 0' 2>/dev/null)
+      EXPORT_LIST_FILE="${EXPORT_LIST_FILE}
 
 *******************************************
 ┌────────────────┐
@@ -6735,20 +7311,39 @@ $(${WORK_DIR}/qrencode $SUBSCRIBE_ADDRESS/${UUID_CONFIRM}/auto2)
 $(info "⬇ Inbound  (total):  $(format_traffic $IN_SUM)")
 $(hint "⬆ Outbound (total):  $(format_traffic $OUT_SUM)")
 "
+    fi
   fi
   # === 结束 ===
 
-  # 生成并显示节点信息
-  echo "$EXPORT_LIST_FILE" > ${WORK_DIR}/list
-  cat ${WORK_DIR}/list
+  # 动态模板模式只写只读模板目录，绝不覆盖静态 list 或订阅文件。
+  if [ "$IS_INSTALL" != 'dynamic_template' ]; then
+    # 等待 clash / clash2 / sing-box 订阅文件生成完成，再发布 list。
+    wait 2>/dev/null
+    echo "$EXPORT_LIST_FILE" > ${WORK_DIR}/list
+    cat ${WORK_DIR}/list
 
+<<<<<<< HEAD
   # 显示脚本使用情况数据
   statistics_of_run_times get
+=======
+    # 显示脚本使用情况数据
+    statistics_of_run_times get
+  else
+    # clash / clash2 在后台生成，等待完成后再由 dynamic_templates_ready() 校验。
+    wait 2>/dev/null
+  fi
+>>>>>>> upstream/main
 
   # 动态订阅开启时，同步刷新只读模板（改端口/增删节点/改配置后，动态响应需反映最新节点）。
   # 子 shell 隔离 export_list 的全局变量副作用，输出丢弃以免污染 list 展示。
   if [ "$IS_INSTALL" != 'dynamic_template' ] && dynamic_sub_enabled; then
+<<<<<<< HEAD
     ( export_list dynamic_template ) >/dev/null 2>&1
+=======
+    if ! ( export_list dynamic_template ) >/dev/null || ! dynamic_templates_ready; then
+      warning " $(text 202) "
+    fi
+>>>>>>> upstream/main
   fi
 }
 
@@ -7167,17 +7762,76 @@ change_protocols() {
 # 卸载 sing-box 全家桶
 uninstall() {
   if [ -d ${WORK_DIR} ]; then
+<<<<<<< HEAD
     [ -s ${ARGO_DAEMON_FILE} ] && cmd_systemctl disable argo &>/dev/null
     [ -s ${SINGBOX_DAEMON_FILE} ] && cmd_systemctl disable sing-box &>/dev/null
+=======
+    # 后台停止并禁用服务；未运行的服务不发送 stop，主脚本不等待停止完成。
+    if [ -s ${ARGO_DAEMON_FILE} ]; then
+      (
+        if service_is_active argo; then
+          if [ "$SYSTEM" = 'Alpine' ]; then
+            rc-service argo stop >/dev/null 2>&1
+          else
+            systemctl stop --no-block argo >/dev/null 2>&1
+          fi
+        fi
+        if [ "$SYSTEM" = 'Alpine' ]; then
+          rc-update del argo default >/dev/null 2>&1
+        else
+          systemctl disable argo >/dev/null 2>&1
+        fi
+        rm -f ${ARGO_DAEMON_FILE}
+      ) >/dev/null 2>&1 &
+    fi
+    if [ -s ${SINGBOX_DAEMON_FILE} ]; then
+      (
+        if service_is_active sing-box; then
+          if [ "$SYSTEM" = 'Alpine' ]; then
+            rc-service sing-box stop >/dev/null 2>&1
+          else
+            systemctl stop --no-block sing-box >/dev/null 2>&1
+          fi
+        fi
+        if [ "$SYSTEM" = 'Alpine' ]; then
+          rc-update del sing-box default >/dev/null 2>&1
+        else
+          systemctl disable sing-box >/dev/null 2>&1
+        fi
+        rm -f ${SINGBOX_DAEMON_FILE}
+      ) >/dev/null 2>&1 &
+    fi
+>>>>>>> upstream/main
     fcgiwrap_stop
     rm -rf "$DYNAMIC_SUBSCRIBE_DIR"
     nginx_stop
     sleep 0.5
-    [[ -s ${WORK_DIR}/nginx.conf && "$(ps -ef | grep -c '[n]ginx')" = 0 ]] && reading "\n $(text 83) " REMOVE_NGINX
-    [ "${REMOVE_NGINX,,}" = 'y' ] && ${PACKAGE_UNINSTALL[int]} nginx >/dev/null 2>&1
+    # 先集中询问所有卸载项，最后统一删除，避免逐项询问、逐项卸载。
+    local UNINSTALL_PKGS=()
+    if [[ -s ${WORK_DIR}/nginx.conf && "$(ps -ef | grep -c '[n]ginx')" = 0 ]] && command -v nginx >/dev/null 2>&1; then
+      local REMOVE_NGINX
+      reading "\n $(text 83) " REMOVE_NGINX
+      case "${REMOVE_NGINX:-}" in y|Y) UNINSTALL_PKGS+=(nginx) ;; esac
+    fi
+    # 动态订阅依赖：worker 停止后，只要已安装就询问是否一并卸载，默认保留。
+    if command -v fcgiwrap >/dev/null 2>&1 || command -v spawn-fcgi >/dev/null 2>&1; then
+      local REMOVE_FCGIWRAP
+      reading "\n $(text 212) " REMOVE_FCGIWRAP
+      case "${REMOVE_FCGIWRAP:-}" in y|Y) UNINSTALL_PKGS+=(fcgiwrap spawn-fcgi) ;; esac
+    fi
+    # 包管理器可能耗时较长；使用 nohup 放到后台，脚本退出后继续完成卸载。
+    if [ "${#UNINSTALL_PKGS[@]}" -gt 0 ]; then
+      local PACKAGE_UNINSTALL_LOG="/tmp/sing-box-uninstall.log"
+      : > "$PACKAGE_UNINSTALL_LOG"
+      if [ "$SYSTEM" = 'Alpine' ]; then
+        nohup sh -c 'apk del "$@" && apk autoremove' sh "${UNINSTALL_PKGS[@]}" >"$PACKAGE_UNINSTALL_LOG" 2>&1 </dev/null &
+      else
+        nohup ${PACKAGE_UNINSTALL[int]} "${UNINSTALL_PKGS[@]}" >"$PACKAGE_UNINSTALL_LOG" 2>&1 </dev/null &
+      fi
+    fi
     purge_service_firewall_rules
     del_port_hopping_nat >/dev/null 2>&1 || true
-    rm -rf ${WORK_DIR} ${TEMP_DIR} ${ARGO_DAEMON_FILE} ${SINGBOX_DAEMON_FILE} /usr/bin/sb
+    rm -rf ${WORK_DIR} ${TEMP_DIR} /usr/bin/sb
     info "\n $(text 16) \n"
   else
     error "\n $(text 15) \n"
@@ -7532,14 +8186,14 @@ for ((PARAM_I=1; PARAM_I<=$#; PARAM_I++)); do
 done
 unset PARAM_I PARAM_V PARAM_N PARAM_LANG
 
+# --CHOOSE_PROTOCOLS 表示非交互快速安装，需要在语言选择前生效。
+[[ "${*^^}" == *"--CHOOSE_PROTOCOLS"* ]] && NONINTERACTIVE_INSTALL=noninteractive_install
+
 # 获取 -F 参数的值
 CONFIG_FILE=$(awk '-F[ =]' 'tolower($1) ~ /^-f$/{print $2}' <<< "$*")
 if [[ -n "$CONFIG_FILE" && -s "$CONFIG_FILE" ]]; then
   NONINTERACTIVE_INSTALL=noninteractive_install
-  . $CONFIG_FILE
-  L=${LANGUAGE^^}
-  [ "$ARGO" = 'true' ] && IS_ARGO=is_argo || IS_ARGO=no_argo
-  [ "$SUBSCRIBE" = 'true' ] && IS_SUB=is_sub || IS_SUB=no_sub
+  load_config_file "$CONFIG_FILE"
 fi
 
 # 卸载模式：仅在语言记录文件缺失时才预设 L=E，避免 select_language 弹交互；
@@ -7555,10 +8209,6 @@ check_brutal
 # 传参处理1: 把所有的 = 变为空格，但保留 =" ，因为 Json TunnelSecret 是 =" 结尾的，如 {"AccountTag":"9cc9e3e4d8f29d2a02e297f14f20513a","TunnelSecret":"6AYfKBOoNlPiTAuWg64ZwujsNuERpWLm6pPJ2qpN8PM=","TunnelID":"1ac55430-f4dc-47d5-a850-bdce824c4101"}
 # 传参处理2: 去掉 sudo cloudflared service install ，以方便用户输入 Token 并能正确读取真正的以 ey 开头的 Value
 ALL_PARAMETER=($(sed -E 's/(-c|-e|-f|-C|-E|-F) //; s/=([^"])/ \1/g; s/sudo cloudflared service install //' <<< $*))
-# KV 参数安装：只要指定 --CHOOSE_PROTOCOLS，就认为用户要无交互安装。
-# 其余参数允许缺省，脚本会按交互模式默认值自动补齐。
-[[ "${ALL_PARAMETER[@]^^}" == *"--CHOOSE_PROTOCOLS"* ]] && NONINTERACTIVE_INSTALL=noninteractive_install
-
 # 传参处理，无交互快速安装参数
 for z in ${!ALL_PARAMETER[@]}; do
   case "${ALL_PARAMETER[z]^^}" in
@@ -7618,7 +8268,8 @@ for z in ${!ALL_PARAMETER[@]}; do
       change_protocols; exit 0
       ;;
     --LANGUAGE )
-      ((z++)); [[ "${ALL_PARAMETER[z]^^}" =~ ^C ]] && LANGUAGE=C || LANGUAGE=E
+      ((z++))
+      if [[ "${ALL_PARAMETER[z]^^}" =~ ^C ]]; then LANGUAGE=C; L=C; else LANGUAGE=E; L=E; fi
       ;;
     --CHOOSE_PROTOCOLS )
       ((z++)); CHOOSE_PROTOCOLS=${ALL_PARAMETER[z]}
@@ -7652,10 +8303,15 @@ for z in ${!ALL_PARAMETER[@]}; do
       NODE_NAME_CONFIRM=${NODE_NAME_ARRAY[@]}
       ;;
     --SUBSCRIBE )
-      ((z++)); [ "${ALL_PARAMETER[z]}" = 'true' ] && IS_SUB=is_sub
+      ((z++)); parse_subscribe_value "${ALL_PARAMETER[z]}"
       ;;
     --ARGO )
-      ((z++)); [ "${ALL_PARAMETER[z]}" = 'true' ] && IS_ARGO=is_argo
+      ((z++))
+      ARGO_EXPLICIT=true
+      case "$(printf '%s' "${ALL_PARAMETER[z]}" | tr '[:upper:]' '[:lower:]')" in
+        true|y|yes|1) IS_ARGO=is_argo ;;
+        false|n|no|0) IS_ARGO=no_argo ;;
+      esac
       ;;
     --ARGO_DOMAIN )
       ((z++)); ARGO_DOMAIN=${ALL_PARAMETER[z]}
@@ -7668,7 +8324,11 @@ for z in ${!ALL_PARAMETER[@]}; do
       [[ "$PORT_HOPPING_START" < "$PORT_HOPPING_END" && "$PORT_HOPPING_START" -ge "$MIN_HOPPING_PORT" && "$PORT_HOPPING_END" -le "$MAX_HOPPING_PORT" ]] && IS_HOPPING=is_hopping
       ;;
     --HY2_REALM|--REALM )
-      ((z++)); [[ "${ALL_PARAMETER[z],,}" =~ ^(true|1|y|yes)$ ]] && IS_HY2_REALM=is_hy2_realm
+      ((z++))
+      case "${ALL_PARAMETER[z],,}" in
+        true|1|y|yes) IS_HY2_REALM=is_hy2_realm ;;
+        false|0|n|no) unset IS_HY2_REALM ;;
+      esac
       ;;
     --BIND_INTERFACE )
       ((z++)); BIND_INTERFACE=${ALL_PARAMETER[z]}
@@ -7685,11 +8345,7 @@ check_dependencies
 check_system_ip
 check_install
 if [ "$NONINTERACTIVE_INSTALL" = 'noninteractive_install' ]; then
-  # 预设默认值，允许只传 --CHOOSE_PROTOCOLS 进行最小无交互安装。
-  CHOOSE_PROTOCOLS=${CHOOSE_PROTOCOLS:-'a'}
-  START_PORT=${START_PORT:-"$START_PORT_DEFAULT"}
-  CDN=${CDN:-"${CDN_DOMAIN[0]}"}
-  IS_SUB=${IS_SUB:-'no_sub'}
+  apply_quiet_defaults
   IS_ARGO=${IS_ARGO:-'no_argo'}
   IS_HOPPING=${IS_HOPPING:-'no_hopping'}
 
@@ -7698,11 +8354,7 @@ if [ "$NONINTERACTIVE_INSTALL" = 'noninteractive_install' ]; then
   create_shortcut
 elif [ "$IS_FAST_INSTALL" = 'is_fast_install' ]; then
   # 预设默认值
-  CHOOSE_PROTOCOLS=${CHOOSE_PROTOCOLS:-'a'}
-  START_PORT=${START_PORT:-"$START_PORT_DEFAULT"}
-  CDN=${CDN:-"${CDN_DOMAIN[0]}"}
-  IS_SUB='is_sub'
-  IS_ARGO='is_argo'
+  apply_quiet_defaults
   [[ "$HY2_PORT_HOPPING_RANGE" =~ ^[0-9]+:[0-9]+$ ]] && IS_HOPPING='is_hopping' || IS_HOPPING='no_hopping'
 
   install_sing-box
